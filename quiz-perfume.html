@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz de Perfumes · Encontre o seu match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FFFFFF;
+    --panel: #F7F7F7;
+    --dark: #111111;
+    --gold: #C9A84C;
+    --gold-light: #E8D6A8;
+    --muted: #6B6B6B;
+    --border: #E5E5E5;
+    --white: #FFFFFF;
+    --accent: #D7A416;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .header {
+    text-align: center;
+    padding: 3rem 0 2.5rem;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+  .header-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--dark);
+    margin-bottom: 0.75rem;
+  }
+  .header h1 em { font-style: italic; color: var(--gold); }
+  .header p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Progress */
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 1px;
+    background: var(--border);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.5s ease;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  /* Steps */
+  .step { display: none; }
+  .step.active { display: block; }
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: var(--dark);
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+  .step-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    line-height: 1.6;
+  }
+  .multi-note {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 0.5px solid var(--gold-light);
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Option Grid */
+  .opts { display: grid; gap: 10px; }
+  .opts.cols-2 { grid-template-columns: 1fr 1fr; }
+  .opts.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .opt {
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: inherit;
+  }
+  .opt:hover { border-color: var(--gold); background: #FEFCF8; }
+  .opt.selected {
+    border-color: var(--gold);
+    border-width: 1px;
+    background: #FEFCF4;
+  }
+  .opt-icon { font-size: 20px; min-width: 26px; line-height: 1; margin-top: 1px; }
+  .opt-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dark);
+    display: block;
+    line-height: 1.3;
+  }
+  .opt-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    display: block;
+    line-height: 1.4;
+  }
+  .opt.selected .opt-label { color: var(--accent); }
+
+  /* Text field */
+  .field-wrap { position: relative; }
+  .field-wrap input, .field-wrap textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.15s;
+    resize: none;
+  }
+  .field-wrap input:focus, .field-wrap textarea:focus { border-color: var(--gold); }
+  .field-wrap input::placeholder, .field-wrap textarea::placeholder { color: #BDB5A8; }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-top: 8px;
+  }
+  .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .btn-back {
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 8px 0;
+    letter-spacing: 0.03em;
+  }
+  .btn-back:hover { color: var(--dark); }
+  .btn-next {
+    background: var(--dark);
+    color: var(--white);
+    border: none;
+    border-radius: 2px;
+    padding: 12px 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-next:hover { background: var(--accent); }
+  .btn-next:disabled { opacity: 0.35; cursor: not-allowed; background: var(--dark); }
+  .btn-skip {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    padding: 8px;
+    font-family: inherit;
+  }
+
+  /* AI Loading */
+  .ai-loading {
+    text-align: center;
+    padding: 4rem 0;
+  }
+  .ai-spinner {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .ai-loading-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+  .ai-loading-sub { font-size: 13px; color: var(--muted); }
+
+  /* Results */
+  .results { display: none; }
+  .results-header { margin-bottom: 2rem; }
+  .results-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .results-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--dark);
+    margin-bottom: 0.4rem;
+  }
+  .results-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .perfume-card {
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+  .perfume-card.top {
+    border-color: var(--gold);
+    background: #FEFCF4;
+  }
+  .rank {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--gold-light);
+    min-width: 28px;
+    line-height: 1;
+    padding-top: 2px;
+  }
+  .perfume-card.top .rank { color: var(--gold); }
+  .perfume-body { flex: 1; }
+  .best-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--white);
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .p-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--dark);
+    margin-bottom: 2px;
+  }
+  .p-brand { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .p-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .p-tag {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 3px 9px;
+    border: 0.5px solid var(--border);
+    border-radius: 99px;
+    color: var(--muted);
+    text-transform: capitalize;
+  }
+  .p-reason { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .ai-insight {
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 6px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .btn-restart {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 2px;
+    padding: 10px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .btn-restart:hover { border-color: var(--gold); color: var(--dark); }
+
+  .no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 480px) {
+    .opts.cols-3 { grid-template-columns: 1fr 1fr; }
+    .opts.cols-2 { grid-template-columns: 1fr; }
+    .header h1 { font-size: 2rem; }
+  }
+
+  /* ============================================================
+     NERO DECANTS — paleta da loja (fontes originais mantidas)
+     ============================================================ */
+  body { -webkit-font-smoothing: antialiased; }
+  /* Cantos retos como na loja */
+  .opt, .field-wrap input, .field-wrap textarea, .perfume-card,
+  .btn-next, .btn-restart, .multi-note, .p-tag, .best-badge {
+    border-radius: 0 !important;
+  }
+  /* Acentos e estados em dourado da loja */
+  .btn-next:hover { background: var(--gold); color: var(--dark); }
+  .best-badge { background: var(--gold); color: var(--dark); }
+  .opt:hover { border-color: var(--gold); background: var(--panel); }
+  .opt.selected { border-color: var(--gold); background: #FBF6E9; }
+  .perfume-card.top { border-color: var(--gold); background: #FBF6E9; }
+  /* Cards clicáveis -> página do produto na loja */
+  .perfume-link { text-decoration: none; color: inherit; display: block; }
+  .perfume-link:hover .perfume-card { border-color: var(--gold); background: #FBF6E9; }
+  .p-cta { margin-top: 12px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-eyebrow">Descoberta olfativa</div>
+    <h1>Qual perfume é <em>o seu?</em></h1>
+    <p>Responda algumas perguntas e encontramos no nosso estoque os perfumes que mais combinam com você.</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="step-label">Passo 1 de 8</span>
+        <span id="step-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    </div>
+
+    <!-- Step 0: Gênero -->
+    <div class="step active" id="s0">
+      <div class="step-title">Para quem é o perfume?</div>
+      <div class="step-hint">Isso ajuda a refinar as sugestões.</div>
+      <div class="opts cols-3">
+        <button class="opt" data-step="0" data-val="masculino" onclick="pick(this)">
+          <div class="opt-icon">♂</div>
+          <div><span class="opt-label">Masculino</span></div>
+        </button>
+        <button class="opt" data-step="0" data-val="feminino" onclick="pick(this)">
+          <div class="opt-icon">♀</div>
+          <div><span class="opt-label">Feminino</span></div>
+        </button>
+        <button class="opt" data-step="0" data-val="compartilhavel" onclick="pick(this)">
+          <div class="opt-icon">⚤</div>
+          <div><span class="opt-label">Compartilhável</span><span class="opt-desc">Para qualquer um</span></div>
+        </button>
+      </div>
+      <div class="nav"><div></div><button class="btn-next" id="n0" disabled onclick="next(0)">Continuar →</button></div>
+    </div>
+
+    <!-- Step 1: Período -->
+    <div class="step" id="s1">
+      <div class="step-title">Quando vai usar mais?</div>
+      <div class="multi-note">✦ Pode escolher mais de uma</div>
+      <div class="opts cols-3">
+        <button class="opt multi" data-step="1" data-val="dia" onclick="pickMulti(this)">
+          <div class="opt-icon">☀</div>
+          <div><span class="opt-label">Dia</span><span class="opt-desc">Manhã e tarde</span></div>
+        </button>
+        <button class="opt multi" data-step="1" data-val="noite" onclick="pickMulti(this)">
+          <div class="opt-icon">🌙</div>
+          <div><span class="opt-label">Noite</span><span class="opt-desc">Festas e jantares</span></div>
+        </button>
+        <button class="opt multi" data-step="1" data-val="qualquer" onclick="pickMulti(this)">
+          <div class="opt-icon">∞</div>
+          <div><span class="opt-label">Qualquer hora</span><span class="opt-desc">Versátil</span></div>
+        </button>
+      </div>
+      <div class="nav"><button class="btn-back" onclick="back(1)">← Voltar</button><button class="btn-next" id="n1" disabled onclick="next(1)">Continuar →</button></div>
+    </div>
+
+    <!-- Step 2: Ocasião -->
+    <div class="step" id="s2">
+      <div class="step-title">Qual a principal ocasião?</div>
+      <div class="multi-note">✦ Pode escolher mais de uma</div>
+      <div class="opts cols-2">
+        <button class="opt multi" data-step="2" data-val="trabalho" onclick="pickMulti(this)">
+          <div class="opt-icon">💼</div>
+          <div><span class="opt-label">Trabalho</span><span class="opt-desc">Escritório e reuniões</span></div>
+        </button>
+        <button class="opt multi" data-step="2" data-val="casual" onclick="pickMulti(this)">
+          <div class="opt-icon">🌿</div>
+          <div><span class="opt-label">Dia a dia</span><span class="opt-desc">Passeios e lazer</span></div>
+        </button>
+        <button class="opt multi" data-step="2" data-val="encontro" onclick="pickMulti(this)">
+          <div class="opt-icon">❤️</div>
+          <div><span class="opt-label">Encontro romântico</span><span class="opt-desc">Jantar, cinema</span></div>
+        </button>
+        <button class="opt multi" data-step="2" data-val="social" onclick="pickMulti(this)">
+          <div class="opt-icon">✦</div>
+          <div><span class="opt-label">Eventos e festas</span><span class="opt-desc">Baladas, casamentos</span></div>
+        </button>
+        <button class="opt multi" data-step="2" data-val="esporte" onclick="pickMulti(this)">
+          <div class="opt-icon">🏃</div>
+          <div><span class="opt-label">Esporte e academia</span><span class="opt-desc">Atividades físicas</span></div>
+        </button>
+      </div>
+      <div class="nav"><button class="btn-back" onclick="back(2)">← Voltar</button><button class="btn-next" id="n2" disabled onclick="next(2)">Continuar →</button></div>
+    </div>
+
+    <!-- Step 3: Clima -->
+    <div class="step" id="s3">
+      <div class="step-title">Qual o clima onde você mora?</div>
+      <div class="step-hint">Alguns perfumes se comportam melhor em determinadas temperaturas.</div>
+      <div class="opts cols-3">
+        <button class="opt" data-step="3" data-val="quente" onclick="pick(this)">
+          <div class="opt-icon">☀</div>
+          <div><span class="opt-label">Quente</span><span class="opt-desc">Acima de 28°C</span></div>
+        </button>
+        <button class="opt" data-step="3" data-val="moderado" onclick="pick(this)">
+          <div class="opt-icon">◌</div>
+          <div><span class="opt-label">Ameno</span><span class="opt-desc">18°C a 28°C</span></div>
+        </button>
+        <button class="opt" data-step="3" data-val="frio" onclick="pick(this)">
+          <div class="opt-icon">❄</div>
+          <div><span class="opt-label">Frio</span><span class="opt-desc">Abaixo de 18°C</span></div>
+        </button>
+      </div>
+      <div class="nav"><button class="btn-back" onclick="back(3)">← Voltar</button><button class="btn-next" id="n3" disabled onclick="next(3)">Continuar →</button></div>
+    </div>
+
+    <!-- Step 4: Notas -->
+    <div class="step" id="s4">
+      <div class="step-title">Que tipo de cheiro te atrai?</div>
+      <div class="multi-note">✦ Pode escolher mais de uma</div>
+      <div class="opts cols-2">
+        <button class="opt multi" data-step="4" data-val="citrico" onclick="pickMulti(this)"><div class="opt-icon">🍋</div><div><span class="opt-label">Cítrico</span><span class="opt-desc">Fresco e efervescente, dá leveza e sensação de limpeza. Ex.: limão, bergamota, laranja.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="amadeirado" onclick="pickMulti(this)"><div class="opt-icon">🪵</div><div><span class="opt-label">Amadeirado</span><span class="opt-desc">Madeira nobre, seco e sofisticado — marcante e duradouro. Ex.: cedro, sândalo, oud.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="floral" onclick="pickMulti(this)"><div class="opt-icon">🌸</div><div><span class="opt-label">Floral</span><span class="opt-desc">Cheiro de flores, elegante e perfumado. Ex.: rosa, jasmim, peônia.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="frutal" onclick="pickMulti(this)"><div class="opt-icon">🍑</div><div><span class="opt-label">Frutal</span><span class="opt-desc">Frutas suculentas, alegre e jovial — fruta fresca, não sobremesa. Ex.: pêssego, maçã, frutas vermelhas.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="oriental" onclick="pickMulti(this)"><div class="opt-icon">🌙</div><div><span class="opt-label">Oriental / especiado</span><span class="opt-desc">Especiarias quentes, envolvente e sensual — ótimo pra noite e frio. Ex.: âmbar, canela, cardamomo.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="oud" onclick="pickMulti(this)"><div class="opt-icon">🖤</div><div><span class="opt-label">Oud / couro / incenso</span><span class="opt-desc">Acordes escuros e intensos — presença forte, marcante e duradoura.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="aquatico" onclick="pickMulti(this)"><div class="opt-icon">🌊</div><div><span class="opt-label">Aquático / fresco</span><span class="opt-desc">Leve e transparente, cheiro de brisa do mar — puro frescor. Ex.: notas marinhas, ar puro.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="adocicado" onclick="pickMulti(this)"><div class="opt-icon">🍯</div><div><span class="opt-label">Levemente adocicado</span><span class="opt-desc">Doçura suave no fundo — baunilha ou mel discretos, sem virar sobremesa.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="gourmand" onclick="pickMulti(this)"><div class="opt-icon">🍫</div><div><span class="opt-label">Gourmand / doce</span><span class="opt-desc">Cheiros doces, como sobremesa — é aqui que mora o "adocicado" intenso. Ex.: baunilha, caramelo, chocolate.</span></div></button>
+        <button class="opt multi" data-step="4" data-val="aromatico" onclick="pickMulti(this)"><div class="opt-icon">🌿</div><div><span class="opt-label">Aromático / herbal</span><span class="opt-desc">Ervas verdes e folhas frescas, sensação limpa e natural. Ex.: lavanda, alecrim, hortelã.</span></div></button>
+      </div>
+      <div class="nav"><button class="btn-back" onclick="back(4)">← Voltar</button><button class="btn-next" id="n4" disabled onclick="next(4)">Continuar →</button></div>
+    </div>
+
+    <!-- Step 5: Famílias vetadas -->
+    <div class="step" id="s5">
+      <div class="step-title">Alguma família que você NÃO quer de jeito nenhum?</div>
+      <div class="step-hint">Perfumes com as famílias marcadas aqui ficam fora dos seus resultados. Pode continuar sem marcar nada.</div>
+      <div class="multi-note">✦ Pode escolher mais de uma — ou nenhuma</div>
+      <div class="opts cols-2">
+        <button class="opt multi" data-step="5" data-val="citrico" onclick="pickAvoid(this)"><div class="opt-icon">🍋</div><div><span class="opt-label">Cítrico</span></div></button>
+        <button class="opt multi" data-step="5" data-val="amadeirado" onclick="pickAvoid(this)"><div class="opt-icon">🪵</div><div><span class="opt-label">Amadeirado</span></div></button>
+        <button class="opt multi" data-step="5" data-val="floral" onclick="pickAvoid(this)"><div class="opt-icon">🌸</div><div><span class="opt-label">Floral</span></div></button>
+        <button class="opt multi" data-step="5" data-val="frutal" onclick="pickAvoid(this)"><div class="opt-icon">🍑</div><div><span class="opt-label">Frutal</span></div></button>
+        <button class="opt multi" data-step="5" data-val="oriental" onclick="pickAvoid(this)"><div class="opt-icon">🌙</div><div><span class="opt-label">Oriental / especiado</span></div></button>
+        <button class="opt multi" data-step="5" data-val="oud" onclick="pickAvoid(this)"><div class="opt-icon">🖤</div><div><span class="opt-label">Oud / couro / incenso</span></div></button>
+        <button class="opt multi" data-step="5" data-val="aquatico" onclick="pickAvoid(this)"><div class="opt-icon">🌊</div><div><span class="opt-label">Aquático / fresco</span></div></button>
+        <button class="opt multi" data-step="5" data-val="adocicado" onclick="pickAvoid(this)"><div class="opt-icon">🍯</div><div><span class="opt-label">Levemente adocicado</span></div></button>
+        <button class="opt multi" data-step="5" data-val="gourmand" onclick="pickAvoid(this)"><div class="opt-icon">🍫</div><div><span class="opt-label">Gourmand / doce</span></div></button>
+        <button class="opt multi" data-step="5" data-val="aromatico" onclick="pickAvoid(this)"><div class="opt-icon">🌿</div><div><span class="opt-label">Aromático / herbal</span></div></button>
+      </div>
+      <div class="nav"><button class="btn-back" onclick="back(5)">← Voltar</button><button class="btn-next" id="n5" onclick="next(5)">Continuar →</button></div>
+    </div>
+
+    <!-- Step 6: Impressão -->
+    <div class="step" id="s6">
+      <div class="step-title">Que impressão você quer causar?</div>
+      <div class="step-hint" id="sweet-hint" style="display:none">💡 Perfil <strong>sedutor</strong> combina com perfumes mais intensos — com toque doce (<strong>🍯 Levemente adocicado</strong>, <strong>🍫 Gourmand</strong>) ou marcantes e envolventes (<strong>🌙 Oriental</strong>, <strong>🖤 Oud / couro / incenso</strong>). Se quiser, volte um passo e ajuste os cheiros.</div>
+      <div class="opts cols-2">
+        <button class="opt" data-step="6" data-val="sofisticado" onclick="pick(this)"><div class="opt-icon">👑</div><div><span class="opt-label">Sofisticado e elegante</span><span class="opt-desc">Presença marcante, ar de luxo</span></div></button>
+        <button class="opt" data-step="6" data-val="sedutor" onclick="pick(this)"><div class="opt-icon">🔥</div><div><span class="opt-label">Sedutor e sensual</span><span class="opt-desc">Rastro irresistível — doce ou intenso</span></div></button>
+        <button class="opt" data-step="6" data-val="fresco" onclick="pick(this)"><div class="opt-icon">🍃</div><div><span class="opt-label">Fresco e limpo</span><span class="opt-desc">Leveza, energia, clean</span></div></button>
+        <button class="opt" data-step="6" data-val="confortavel" onclick="pick(this)"><div class="opt-icon" style="color:#4A90D9">☁︎</div><div><span class="opt-label">Confortável e acolhedor</span><span class="opt-desc">Quentinho, abraçante</span></div></button>
+        <button class="opt" data-step="6" data-val="moderno" onclick="pick(this)"><div class="opt-icon">✨</div><div><span class="opt-label">Moderno e diferente</span><span class="opt-desc">Fora do convencional</span></div></button>
+        <button class="opt" data-step="6" data-val="natural" onclick="pick(this)"><div class="opt-icon">🌱</div><div><span class="opt-label">Natural e discreto</span><span class="opt-desc">Sutil, próximo da pele</span></div></button>
+      </div>
+      <div class="nav"><button class="btn-back" onclick="back(6)">← Voltar</button><button class="btn-next" id="n6" disabled onclick="next(6)">Continuar →</button></div>
+    </div>
+
+    <!-- Step 7: Ama -->
+    <div class="step" id="s7">
+      <div class="step-title">Tem um perfume que você ama?</div>
+      <div class="step-hint">Nossa IA vai analisar as notas e acordes desse perfume para buscar similaridades no estoque. Pode pular se não souber.</div>
+      <div class="field-wrap">
+        <input type="text" id="loves-input" placeholder="Ex: Sauvage Dior, Chanel N°5, Good Girl, Acqua di Gio..." oninput="enableBtn('n7')">
+      </div>
+      <div class="ai-badge"><div class="ai-dot"></div> Interpretado por IA</div>
+      <div class="nav">
+        <button class="btn-back" onclick="back(7)">← Voltar</button>
+        <div style="display:flex;align-items:center;gap:16px">
+          <button class="btn-skip" onclick="finalize()">Pular e ver resultados</button>
+          <button class="btn-next" id="n7" onclick="finalize()">Ver meus perfumes →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI LOADING -->
+  <div class="ai-loading" id="ai-loading" style="display:none">
+    <div class="ai-spinner"></div>
+    <div class="ai-loading-title">Nossa IA está analisando seu perfil…</div>
+    <div class="ai-loading-sub" id="loading-msg">Buscando correspondências olfativas no estoque</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+    <div class="results-header">
+      <div class="results-eyebrow">Seus matches olfativos</div>
+      <div class="results-title" id="res-title">Encontramos os seus perfumes</div>
+      <div class="results-sub" id="res-sub"></div>
+    </div>
+    <div id="results-list"></div>
+    <button class="btn-restart" onclick="restart()">↺ Fazer o quiz novamente</button>
+  </div>
+</div>
+
+<script>
+const STATE = { gender:null, period:[], occasion:[], clima:null, notes:[], avoid:[], impression:null, loves:'', hates:'' };
+let cur = 0;
+let NOTE_MODE = 'all'; // 'all' = exige todas as famílias escolhidas; 'any' = pelo menos uma (fallback)
+
+// ============================================================
+// CATÁLOGO COMPLETO COM NOTAS REAIS
+// ============================================================
+const CAT = [
+  { n:"Nocturno Elixir", b:"Rayhaan", g:["masculino"], p:["noite","qualquer"], oc:["encontro","social","trabalho"], cl:["frio","quente"], nt:["aromatico","amadeirado","oriental","citrico"], im:["fresco","moderno","sedutor","sofisticado"], ins:"Bleu de Chanel L'Exclusif", u:"nocturno-rayhaan-bleu-1dh22", desc:"Aromático Amadeirado Especiado. Topo: Raspas de limão, bergamota, hortelã, artemísia. Coração: Lavanda, gerânio, abacaxi. Base: Sândalo." },
+  { n:"Maktub Gold", b:"Bidaya", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["citrico","frutal","oriental","amadeirado"], im:["sofisticado","fresco","sedutor"], ins:"Erba Gold", u:"makutb-gold-bidaya-erba-gold-1qkq4", desc:"Frutado Cítrico Especiado. Topo: Laranja brasileira, Gengibre, Bergamota da Calábria e Limão siciliano. Coração: Pera suculenta, Canela, Cardamomo da Guatemala e Cravo-da-índia. Base: Baunilha de Madagascar, Notas amadeiradas, Almíscar branco e Âmbar cinzento." },
+  { n:"Colônia Aventhis", b:"In The Box", g:["masculino"], p:["noite"], oc:["casual","encontro"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico","frutal"], im:["sofisticado","moderno","natural"], ins:"Aventus Cologne", u:"colonia-aventhis-in-the-box", desc:"Cítrico Amadeirado Aromático. Topo: Pimenta Rosa, Gengibre, Mandarina. Coração: Vetiver, Patchouli, Abacaxi. Base: Bétula, Styrax, Almíscar." },
+  { n:"Blanche Exquise", b:"In The Box", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["moderado"], nt:["floral","amadeirado","gourmand","citrico"], im:["sofisticado","moderno","confortavel"], ins:"Valaya Exclusif", u:"blanche-exquise-in-the-box", desc:"Floral Amadeirado Almiscarado. Topo: Amêndoa, Mandarina, Bergamota. Coração: Notas Atalcadas, Flores Brancas, Flor de Laranjeira. Base: Baunilha, Ambroxan, Akigalawood, Sândalo." },
+  { n:"Soft Splendor", b:"In The Box", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","social"], cl:["quente"], nt:["floral","frutal","amadeirado"], im:["sofisticado","fresco","sedutor"], ins:"Chance Eau Splendide", u:"soft-splendor-in-the-box", desc:"Floral Frutado Almiscarado. Topo: Frutas Vermelhas, Framboesa, Pêssego, Rosa, Violeta. Coração: Íris, Gerânio Rosa. Base: Almíscar Branco, Cedro." },
+  { n:"Jaddy", b:"In The Box", g:["feminino"], p:["noite"], oc:["casual","social"], cl:["quente","moderado"], nt:["floral","frutal","amadeirado","citrico","adocicado"], im:["sofisticado","fresco","sedutor"], ins:"J'adore", u:"jaddy-in-the-box", desc:"Floral Frutado Amadeirado. Topo: Pera, Melão, Magnólia, Pêssego, Mandarina, Bergamota. Coração: Jasmim, Muguet, Tuberosa, Frésia, Rosa, Orquídea, Ameixa, Violeta. Base: Almíscar, Baunilha, Amora, Cedro." },
+  { n:"Spiced Agarwood", b:"In The Box", g:["masculino"], p:["noite"], oc:["casual","social"], cl:["moderado"], nt:["citrico","amadeirado","oriental","gourmand","oud"], im:["sofisticado","sedutor"], ins:"Oud Zarian", u:"spiced-agarwood-in-the-box", desc:"Amadeirado Especiado Cítrico. Topo: Especiarias, Olíbano, Gengibre, Bergamota. Coração: Rosa Centifólia. Base: Alcaçuz, Mirra, Oud, Fava Tonka, Sândalo, Patchouli." },
+  { n:"Vanilla Dominion", b:"In The Box", g:["masculino"], p:["qualquer"], oc:["encontro"], cl:["quente","frio"], nt:["amadeirado","oriental","gourmand","citrico","aromatico"], im:["sofisticado"], ins:"Althaïr", u:"vanilla-dominion-in-the-box", desc:"Baunilhado Amadeirado Ambarado. Topo: Bergamota, Canela, Cardamomo, Flor de Laranjeira. Coração: Baunilha de Bourbon, Elemi. Base: Pralinê, Ambroxan, Madeira Guaiac, Almíscar, Fava Tonka, Amêndoa." },
+  { n:"Fleur Délicate", b:"In The Box", g:["feminino"], p:["noite"], oc:["casual","social"], cl:["moderado","frio"], nt:["floral","amadeirado","oriental","frutal"], im:["sofisticado","fresco"], ins:"Chloé EDP", u:"fleur-delicate-in-the-box", desc:"Floral Amadeirado Atalcado. Topo: Peônia, Lichia, Frésia. Coração: Rosa, Muguet, Magnólia. Base: Cedro da Virgínia, Âmbar." },
+  { n:"Mare Di Luci", b:"Nuancielo", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["quente"], nt:["citrico","amadeirado","aromatico"], im:["sofisticado","moderno"], ins:"Afternoon Swim | Pacific Chill", u:"mare-di-luci-nuancielo", desc:"Cítrico Aromático Amadeirado. Topo: Bergamota, Tangerina, Laranja. Coração: Gengibre. Base: Âmbar Cinza." },
+  { n:"Domini", b:"Nuancielo", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["moderado","frio"], nt:["amadeirado","oriental","floral","oud"], im:["sofisticado","fresco","sedutor"], ins:"Santal 33", u:"domini-nuancielo", desc:"Amadeirado Atalcado Couro. Topo: Papiro, Íris. Coração: Cedro da Virgínia, Violeta, Cardamomo. Base: Sândalo, Couro, Âmbar." },
+  { n:"Golden Queen", b:"Nuancielo", g:["feminino"], p:["noite"], oc:["social"], cl:["quente","moderado"], nt:["floral","frutal","amadeirado","citrico","adocicado"], im:["sofisticado","sedutor"], ins:"J'adore", u:"golden-queen-nuancielo", desc:"Floral Frutado Amadeirado. Topo: Magnólia, Melão, Pêssego, Bergamota, Pêra, Tangerina. Coração: Tuberosa, Ameixa, Violeta, Orquídea, Frésia, Jasmim, Muguet, Rosa. Base: Almíscar, Baunilha, Cedro, Amora." },
+  { n:"Dolce Bianco", b:"Nuancielo", g:["compartilhavel"], p:["noite","qualquer"], oc:["casual","social"], cl:["quente"], nt:["gourmand","oriental"], im:["sofisticado","fresco","sedutor"], ins:"Bianco Latte", u:"dolce-bianco-nuancielo", desc:"Gourmand Baunilhado Doce. Topo: Caramelo. Coração: Cumarina, Mel. Base: Baunilha, Almíscar Branco." },
+  { n:"Mondé Parallèle", b:"Nuancielo", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","citrico"], im:["sofisticado","fresco","sedutor"], ins:"Solo", u:"monde-parallele-nuancielo", desc:"Amadeirado Aromático Especiado. Topo: Tangerina, Goiaba, Lavanda, Limão, Alecrim, Tomilho. Coração: Pimenta Rosa, Canela, Noz-moscada, Hortelã, Anis. Base: Âmbar, Baunilha, Almíscar, Musgo de Carvalho." },
+  { n:"Caffè Rosato", b:"Nuancielo", g:["compartilhavel"], p:["noite"], oc:["encontro"], cl:["moderado","frio"], nt:["floral","gourmand","oriental"], im:["sofisticado","sedutor"], ins:"Intense Café", u:"caffe-rosato-nuancielo", desc:"Gourmand Floral Baunilhado. Topo: Notas Florais. Coração: Rosa, Café. Base: Baunilha, Almíscar Branco, Âmbar." },
+  { n:"Everest", b:"Nuancielo", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["quente","moderado"], nt:["citrico","amadeirado"], im:["sofisticado","moderno","natural"], ins:"Himalaya", u:"everest-nuancielo", desc:"Amadeirado Cítrico Almiscarado. Topo: Bergamota da Calábria, Limão Siciliano, Toranja. Coração: Sândalo. Base: Ambroxan, Almíscar, Cedro." },
+  { n:"Vanilla 01", b:"Swiss Arabian", g:["compartilhavel"], p:["noite"], oc:["encontro"], cl:["frio"], nt:["floral","gourmand","oriental","amadeirado"], im:["sofisticado","sedutor","confortavel"], ins:"Spiritueuse Double Vanille | Vanilla 28", u:"vanilla-01-swiss-arabian", desc:"Baunilhado Floral Gourmand. Topo: Flor de Laranjeira, Coco, Pimenta Rosa. Coração: Tuberosa, Cappuccino, Jasmim Indiano, Caramelo. Base: Baunilha Bourbon, Sândalo, Almíscar, Fava Tonka." },
+  { n:"Incense 01", b:"Swiss Arabian", g:["compartilhavel"], p:["noite"], oc:["social"], cl:["frio"], nt:["gourmand","oriental","citrico","floral","amadeirado","oud"], im:["sofisticado","fresco","sedutor"], ins:"Encens Suave | Purpose", u:"incense-01-swiss-arabian", desc:"Incensado Baunilhado Especiado. Topo: Olíbano, Rum, Zimbro, Bergamota. Coração: Figo, Avelã, Nozes Tostadas, Amêndoa, Muguet. Base: Olíbano, Baunilha, Sândalo, Chocolate Amargo, Cedro, Musgo." },
+  { n:"Musk 07", b:"Swiss Arabian", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","encontro"], cl:["moderado"], nt:["floral","amadeirado","frutal"], im:["sofisticado","fresco","confortavel"], ins:"Musk Therapy | Valaya", u:"musk-07-swiss-arabian", desc:"Almiscarado Floral Amadeirado. Topo: Romã, Groselha Preta. Coração: Rosa, Muguet. Base: Almíscar, Patchouli." },
+  { n:"Oud 01", b:"Swiss Arabian", g:["compartilhavel"], p:["noite"], oc:["social"], cl:["frio"], nt:["floral","oriental","amadeirado","oud"], im:["sofisticado","sedutor","confortavel"], ins:"Ombré Leather", u:"oud-01-swiss-arabian", desc:"Couro Floral Ambarado. Topo: Framboesa, Folha de Violeta, Cominho. Coração: Rosa Turca, Cardamomo, Muguet. Base: Oud, Couro, Âmbar." },
+  { n:"Rose 01", b:"Swiss Arabian", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["floral","frutal","amadeirado","gourmand","citrico"], im:["sofisticado","moderno","sedutor"], ins:"Delina", u:"rose-01-swiss-arabian", desc:"Floral Frutado Almiscarado. Topo: Lichia, Bergamota, Pimenta Rosa. Coração: Rosa Búlgara, Peônia, Noz-moscada. Base: Almíscar, Baunilha, Cashmere Wood." },
+  { n:"Tobacco 01", b:"Swiss Arabian", g:["masculino"], p:["noite"], oc:["encontro"], cl:["frio"], nt:["gourmand","oriental","frutal","amadeirado"], im:["sedutor","confortavel"], ins:"Tobacco Vanille | Side Effect", u:"tobacco-01-swiss-arabian", desc:"Baunilhado Especiado Doce. Topo: Ameixa, Maçã, Alcaçuz, Cominho, Pimenta Rosa. Coração: Ládano, Âmbar, Patchouli, Ylang Ylang. Base: Tabaco, Mel, Baunilha, Sândalo, Almíscar, Cashmere Wood." },
+  { n:"Salvo Intense", b:"Maison Alhambra", g:["masculino"], p:["noite"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["aromatico","oriental","gourmand","citrico"], im:["sofisticado","moderno","natural"], ins:"Sauvage EDP", u:"decant-salvo-intense-maison-alhambra-sauvage-edp", desc:"Aromático Ambarado Especiado. Topo: Bergamota da Calábria e Pimenta. Coração: Pimenta de Sichuan, Lavanda, Anis Estrelado e Noz-moscada. Base: Ambroxan e Baunilha." },
+  { n:"Spectre Ghost", b:"French Avenue", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["amadeirado","gourmand","oriental","citrico","frutal"], im:["sofisticado","fresco"], ins:"Ani Nishane", u:"decant-spectre-ghost-french-avenue", desc:"Baunilhado Especiado Amadeirado. Topo: Gengibre, Cardamomo e Bergamota. Coração: Pimenta Rosa, Groselha Preta e Rosa. Base: Baunilha, Cedro e Patchouli." },
+  { n:"Khamrah Qahwa", b:"Lattafa", g:["compartilhavel"], p:["noite","qualquer"], oc:["social","encontro"], cl:["quente","frio"], nt:["gourmand","oriental"], im:["sofisticado","confortavel"], ins:"Linha Khamrah", u:"khamrah-qahwa-lattafa", desc:"Baunilhado Especiado Doce. Topo: Canela, Cardamomo e Gengibre. Coração: Pralinê, Fruta Cristalizada e Flores Brancas. Base: Café, Baunilha, Fava Tonka, Benjoim e Almíscar." },
+  { n:"Sabah Al Ward", b:"Al Wataniah", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["floral","gourmand","oriental","citrico","amadeirado"], im:["sofisticado","moderno","sedutor"], ins:"Autoral Al Wataniah", u:"sabah-al-ward-al-wataniah", desc:"Baunilhado Floral Doce. Topo: Pimenta Rosa e Mandarina. Coração: Cacau, Flor de Laranjeira e Jasmim Sambac. Base: Baunilha, Fava Tonka e Patchouli." },
+  { n:"Watani", b:"Al Wataniah", g:["feminino"], p:["noite"], oc:["trabalho","casual","social","encontro"], cl:["frio"], nt:["floral","frutal","oriental"], im:["sofisticado","fresco","natural"], ins:"Sí", u:"watani-al-wataniah", desc:"Frutado Floral Ambarado. Topo: Frutas, Frutas Tropicais e Notas Herbais. Coração: Frutas, Notas Florais e Notas Doces. Base: Almíscar, Notas Doces e Âmbar." },
+  { n:"Liquid Brun", b:"French Avenue", g:["masculino"], p:["noite"], oc:["encontro"], cl:["moderado"], nt:["amadeirado","oriental","gourmand","citrico","aromatico"], im:["sofisticado","sedutor"], ins:"Althaïr", u:"liquid-brun-french-avenue", desc:"Amadeirado Baunilhado Ambarado. Topo: Canela, Cardamomo, Flor de Laranjeira e Bergamota. Coração: Baunilha de Bourbon e Elemi. Base: Pralinê, Ambroxan, Madeira Guaiac e Almíscar." },
+  { n:"Oásis Bidaya", b:"Mawwal", g:["feminino"], p:["noite"], oc:["social"], cl:["moderado"], nt:["floral","amadeirado","aromatico","oriental","citrico","oud"], im:["sofisticado","fresco","sedutor"], ins:"Autoral Mawwal", u:"oasis-bidaya-mawwal-autoral-mawwal-17e5b", desc:"Chipre Floral Couro. Topo: Rosa, Flor de Laranjeira, Bergamota e Jacinto. Coração: Gardênia, Gerânio, Jasmim, Patchouli e Lírio-do-Vale (Muguet). Base: Incenso, Almíscar (Musk), Couro, Agarwood (Oud), Âmbar e Baunilha de Madagascar." },
+  { n:"Elliur", b:"Bidaya", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["quente"], nt:["citrico","frutal","aromatico"], im:["sofisticado","moderno","fresco"], ins:"Pacific Chill", u:"elliur-bidaya-pacific-chill-1pepr", desc:"Cítrico Aromático Frutado. Topo: Hortelã, Limão, Cidra, Laranja e Groselha preta. Coração: Damasco, Manjericão, Coentro e Rosa de Maio. Base: Figo, Tâmaras, Ambreta e Cenoura." },
+  { n:"Turathi Blue", b:"Afnam", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["quente"], nt:["citrico","amadeirado","aromatico","oriental"], im:["sofisticado","moderno","natural"], ins:"Tygar", u:"turathi-blue-afnam-tygar-nvsmh", desc:"Cítrico Aromático Amadeirado. Topo: Bergamota e Mandarina. Coração: Âmbar e Notas Amadeiradas. Base: Almíscar, Patchouli e Especiarias." },
+  { n:"Ayat", b:"Bidaya", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["floral","frutal","oriental","gourmand"], im:["sofisticado","fresco","sedutor"], ins:"Hibiscus Mahajád", u:"ayat-bidaya-hibiscus-mahajad-1ryy3", desc:"Floral Frutado Especiado. Topo: Hortelã picante, Hibisco e Groselha preta. Coração: Rosa damascena, Baunilha, Ambreta e Canela. Base: Âmbar e Couro." },
+  { n:"Momento", b:"Riiffs", g:["compartilhavel"], p:["qualquer"], oc:["casual","social","encontro"], cl:["quente"], nt:["oriental","gourmand","amadeirado","citrico"], im:["sofisticado","sedutor","confortavel"], ins:"Arabians Tonka", u:"momento-riiffs-arabians-tonka-q858d", desc:"Doce Baunilhado Ambarado. Topo: Açúcar, Açafrão e Mandarina. Coração: Fava Tonka, Rosa Damascena e Agarwood (Oud). Base: Caramelo, Madeira de Âmbar e Cedro." },
+  { n:"Spice Garden", b:"JA Essence", g:["masculino"], p:["dia","qualquer"], oc:["casual","social"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico"], im:["sofisticado","moderno","confortavel"], ins:"Tygar", u:"spice-garden-ja-essence", desc:"Cítrico Aromático Amadeirado. Topo: Toranja. Coração: Ambrox. Base: Madeiras Nobres." },
+  { n:"Powder", b:"JA Essence", g:["compartilhavel"], p:["dia","qualquer"], oc:["casual","encontro"], cl:["moderado","frio"], nt:["gourmand","oriental","floral"], im:["sofisticado","moderno","confortavel"], ins:"Vanilla Powder", u:"powder-ja-essence", desc:"Gourmand Baunilhado Atalcado. Topo: Coco em Pó e Heliotrópio. Coração: Baunilha de Madagascar. Base: Baunilha Absoluta, Almíscar Branco, Almíscar, Palo Santo, Coco e Lactonas." },
+  { n:"Divinity Monkey", b:"JA Essence", g:["compartilhavel"], p:["qualquer"], oc:["encontro"], cl:["moderado"], nt:["floral","amadeirado","oriental","citrico","frutal"], im:["sofisticado","fresco","sedutor"], ins:"Hanuman", u:"divinity-monkey-ja-essence", desc:"Floral Amadeirado Almiscarado. Topo: Flor de Laranjeira, Bergamota, Limão e Groselha Preta. Coração: Osmanthus, Néroli, Magnólia e Cyclamen. Base: Vetiver, Cedro, Almíscar, Âmbar e Sândalo." },
+  { n:"Dark Moon", b:"JA Essence", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["moderado","frio"], nt:["oriental","gourmand","amadeirado"], im:["sofisticado","sedutor"], ins:"Lune Feline", u:"dark-moon-ja-essence", desc:"Ambarado Baunilhado Especiado. Topo: Cardamomo, Canela e Pimenta Rosa. Coração: Âmbar Cinzento, Notas Amadeiradas, Estoraque, Cedro e Notas Verdes. Base: Baunilha do Tahiti, Bálsamo do Peru e Almíscar." },
+  { n:"Bull 21", b:"JA Essence", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho"], cl:["quente"], nt:["citrico","aromatico","frutal","floral"], im:["sofisticado","fresco","sedutor"], ins:"Torino21", u:"bull-21-ja-essence", desc:"Aromático Verde Cítrico. Topo: Hortelã, Limão, Manjericão e Tomilho. Coração: Groselha Preta, Lavanda, Alecrim e Jasmim. Base: Lúcia-lima e Almíscar." },
+  { n:"Haya", b:"Lattafa", g:["feminino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["floral","frutal","oriental","amadeirado","citrico","adocicado"], im:["sofisticado","moderno"], ins:"Paradoxe", u:"haya-lattafa", desc:"Floral Frutado Ambarado. Topo: Morango, Champanhe, Tangerina, Laranja-sanguínea e Rosa. Coração: Gardênia, Jasmim e Orquídea-baunilha. Base: Âmbar, Sândalo e Castanha." },
+  { n:"9am Dive", b:"Afnan", g:["masculino"], p:["qualquer"], oc:["trabalho","casual","esporte"], cl:["moderado"], nt:["amadeirado","aromatico","aquatico","frutal","oriental"], im:["sofisticado","moderno","natural"], ins:"Bleu | Y EDP", u:"9am-dive-afnan", desc:"Aromático Aquático Amadeirado. Topo: Hortelã, Limão, Groselha Preta e Pimenta Rosa. Coração: Maçã verde, Cedro e Incenso. Base: Gengibre, Sândalo, Patchouli e Jasmim." },
+  { n:"Amórgos Absolu", b:"Thera Cosméticos", g:["masculino"], p:["qualquer"], oc:["trabalho","social"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","floral","citrico"], im:["sofisticado","moderno"], ins:"Autoral Thera Cosméticos", u:"amorgos-absolu-thera-cosmeticos", desc:"Aromático Amadeirado Ambarado. Topo: Lavanda, Limão siciliano e Hortelã. Coração: Cedro, Gerânio e Patchouli. Base: Sândalo, Vetiver e Âmbar." },
+  { n:"Club de Nuit Intense Man EDT", b:"Armaf", g:["masculino"], p:["dia","qualquer"], oc:["casual","social"], cl:["moderado"], nt:["frutal","amadeirado","aromatico","oriental","gourmand"], im:["sofisticado","moderno","sedutor"], ins:"Aventus", u:"club-de-nuit-intense-man-edt-armaf", desc:"Chipre Frutado Amadeirado. Topo: Limão, abacaxi, bergamota, groselha preta e maçã. Coração: Rosa, jasmim e bétula. Base: Baunilha, almíscar, âmbar cinzento e patchouli." },
+  { n:"Thone", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["quente"], nt:["citrico","amadeirado"], im:["sofisticado","fresco","confortavel"], ins:"The One for Men", u:"thone-thera-cosmeticos", desc:"Cítrico Amadeirado Almiscarado. Topo: Bergamota Italiana. Coração: Chá Verde Orgânico e Almíscar. Base: Sândalo Australiano." },
+  { n:"Opel", b:"Thera Cosméticos", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["floral","oriental","amadeirado","oud"], im:["sofisticado","moderno","sedutor"], ins:"Ombré Leather", u:"opel-thera-cosmeticos", desc:"Couro Floral Especiado. Topo: Cardamomo. Coração: Jasmim e Couro. Base: Âmbar, Patchouli e Musgo." },
+  { n:"Mitre", b:"Thera Cosméticos", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["amadeirado","oriental","aromatico","citrico","oud"], im:["sofisticado","sedutor"], ins:"M7", u:"mitre-thera-cosmeticos", desc:"Amadeirado Ambarado Resinoso. Topo: Alecrim, Tangerina e Bergamota. Coração: Agarwood (Oud) e Vetiver. Base: Âmbar e Almíscar." },
+  { n:"Sucre", b:"Thera Cosméticos", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["oriental","gourmand","amadeirado","aromatico","citrico","oud"], im:["sofisticado","fresco","sedutor"], ins:"CH Men Privé", u:"sucre-thera-cosmeticos", desc:"Couro Especiado Doce. Topo: Toranja, Pomelo e Whisky. Coração: Lavanda, Sálvia, Tomilho e Cardamomo. Base: Couro, Benjoim, Fava Tonka e Notas amadeiradas." },
+  { n:"Manner", b:"Thera Cosméticos", g:["compartilhavel"], p:["noite"], oc:["casual","social"], cl:["frio"], nt:["floral","oriental","gourmand","citrico","frutal"], im:["fresco","sedutor","confortavel"], ins:"Nishani Ani", u:"manner-thera-cosmeticos", desc:"Floral Ambarado Especiado. Topo: Gengibre, Bergamota e Pimenta Rosa. Coração: Groselha Preta, Rosa Turca e Cardamomo. Base: Baunilha, Patchouli e Sândalo." },
+  { n:"Harmony", b:"Al Haramain", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico","floral"], im:["sofisticado","moderno"], ins:"Symphony | Vibrato", u:"harmony-al-haramain", desc:"Cítrico Aromático Amadeirado. Topo: Toranja, Bergamota e Gengibre. Coração: Limão, Especiarias Frescas e Notas Aromáticas. Base: Notas Frescas, Florais e Gerânio." },
+  { n:"Corina", b:"Thera Cosméticos", g:["feminino"], p:["dia","qualquer"], oc:["social","encontro"], cl:["quente"], nt:["floral","amadeirado","citrico","gourmand"], im:["sofisticado","fresco","sedutor"], ins:"Autoral Thera Cosméticos", u:"corina-thera-cosmeticos", desc:"Floral Tropical Amadeirado. Topo: Manga, Bergamota e Lima. Coração: Tuberosa, Violeta, Rosa e Íris. Base: Coco, Almíscar e Sândalo." },
+  { n:"Shiyaaka Snow", b:"Khadlaj", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","encontro","esporte"], cl:["quente"], nt:["citrico","aromatico","oriental","amadeirado"], im:["sofisticado","moderno"], ins:"Météore", u:"shiyaaka-snow-khadlaj", desc:"Cítrico Aromático Especiado. Topo: Bergamota e Tangerina. Coração: Pimenta-rosa, Noz-moscada e Néroli. Base: Cardamomo e Vetiver." },
+  { n:"Ilicite", b:"Thera Cosméticos", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["quente","moderado"], nt:["floral","amadeirado","citrico"], im:["sofisticado","moderno"], ins:"L'Interdit", u:"ilicite-thera-cosmeticos", desc:"Floral Amadeirado Almiscarado. Topo: Bergamota e Gengibre. Coração: Néroli, Jasmim e Tuberosa. Base: Vetiver e Patchouli." },
+  { n:"Dã Absolu", b:"Thera Cosméticos", g:["feminino"], p:["noite","qualquer"], oc:["social","encontro"], cl:["quente"], nt:["amadeirado","oriental","gourmand","frutal","floral"], im:["sofisticado","sedutor"], ins:"Hypnotic Poison", u:"da-absolu-thera-cosmeticos", desc:"Ambarado Baunilhado Amadeirado. Topo: Licor de Cereja, Pimenta Rosa e Cassis. Coração: Capuccino, Framboesa e Jasmim Sambac. Base: Fava Tonka, Sândalo e Labdanum." },
+  { n:"Ágar", b:"Nuancielo", g:["feminino"], p:["noite","qualquer"], oc:["casual","social","encontro"], cl:["moderado","frio"], nt:["floral","amadeirado","gourmand","oriental"], im:["moderno","fresco","sedutor"], ins:"Olympéa", u:"agar-nuancielo", desc:"Floral Baunilhado Almiscarado. Topo: Tangerina Verde, Jasmim Aquático e Flor de Gengibre. Coração: Sal e Baunilha. Base: Âmbar e Sândalo." },
+  { n:"Obsidiam", b:"Rayhaan", g:["masculino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","floral","oud"], im:["sofisticado","moderno"], ins:"Dior Homme", u:"obsidiam-rayhaan", desc:"Amadeirado Couro Aromático. Topo: Íris e Cítricos. Coração: Couro. Base: Sândalo, Ambrette, Cedro e Oud." },
+  { n:"Cotton Veil", b:"In The Box", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["quente","moderado"], nt:["floral","amadeirado","citrico","adocicado"], im:["sofisticado","moderno","confortavel"], ins:"Valaya", u:"cotton-veil-in-the-box", desc:"Floral Almiscarado Amadeirado. Topo: Bergamota, Pêssego Branco, Aldeídos e Mandarina. Coração: Flor de Laranjeira, Lírio-do-vale, Mahonia, Vetiver e Petalia. Base: Musk, Ambroxan, Akigalawood e Baunilha." },
+  { n:"Asad Bourbon", b:"Lattafa", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["aromatico","oriental","gourmand","amadeirado"], im:["sofisticado","moderno"], ins:"Stronger With You Intensely | Le Male Elixir", u:"asad-bourbon-lattafa", desc:"Ambarado Aromático Baunilhado. Topo: Lavanda, Ameixa Mirabelle e Pimenta-rosa. Coração: Cacau, Noz-moscada e Davana. Base: Baunilha Bourbon, Âmbar e Vetiver." },
+  { n:"Classic Stone", b:"Lattafa", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["moderado","frio"], nt:["amadeirado","oriental","gourmand","floral"], im:["sofisticado","sedutor"], ins:"Althair | Tobacco Vanille", u:"classic-stone-lattafa", desc:"Ambarado Baunilhado Amadeirado. Topo: Violeta, Açafrão, Cardamomo e Cominho. Coração: Camurça, Osmanto, Cravo e Noz-moscada. Base: Notas Amadeiradas, Ambergris, Musgo de Carvalho e Almíscar." },
+  { n:"Supremacy Collector's Edition", b:"Afnan", g:["masculino"], p:["qualquer"], oc:["social","encontro"], cl:["moderado"], nt:["frutal","amadeirado","aromatico","oriental","citrico"], im:["sofisticado","fresco","sedutor"], ins:"Absolu Aventus", u:"supremacy-collectors-edition-afnan", desc:"Chipre Frutado Amadeirado. Topo: Abacaxi, bergamota, flores brancas e maçã. Coração: Flor de laranjeira, bétula e âmbar. Base: Musgo de carvalho, almíscar e ambergris." },
+  { n:"Club de Nuit Intense Man Parfum", b:"Armaf", g:["masculino"], p:["noite","qualquer"], oc:["trabalho","social"], cl:["moderado"], nt:["frutal","amadeirado","aromatico","oriental","gourmand"], im:["sofisticado","moderno"], ins:"Aventus", u:"club-de-nuit-intense-man-parfum-armaf", desc:"Chipre Frutado Amadeirado. Topo: Abacaxi, limão, bergamota, groselha preta e maçã. Coração: Rosa, jasmim e bétula. Base: Baunilha, almíscar, âmbar cinzento e patchouli." },
+  { n:"Philos Messenger", b:"Maison Alhambra", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente"], nt:["citrico","amadeirado","aromatico","oriental","floral"], im:["sofisticado","moderno","sedutor"], ins:"Vibrato", u:"philos-messenger-maison-alhambra", desc:"Cítrico Aromático Amadeirado. Topo: Toranja, Gengibre e Bergamota. Coração: Jasmim, Magnólia e Íris (orris). Base: Almíscar, Cedro, Âmbar e Patchouli." },
+  { n:"Mubarak", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico","frutal","floral"], im:["sofisticado","moderno","sedutor"], ins:"Hacivat", u:"mubarak-thera-cosmeticos", desc:"Cítrico Chipre Amadeirado. Topo: Bergamota, Abacaxi e Toranja. Coração: Jasmim. Base: Musgo de carvalho e Cedro." },
+  { n:"La Voie", b:"Maison Alhambra", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado","frio"], nt:["floral","gourmand","oriental"], im:["sofisticado","sedutor","confortavel"], ins:"My Way", u:"la-voie-maison-alhambra", desc:"Floral Branco Baunilhado. Topo: Flor de Laranjeira e Bergamota. Coração: Tuberosa e Jasmim Indiano. Base: Baunilha de Madagascar, Almíscar Branco e Cedro da Virgínia." },
+  { n:"Club de Nuit Woman", b:"Armaf", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["floral","amadeirado","aromatico","gourmand","citrico"], im:["sofisticado","sedutor","confortavel"], ins:"Coco Mademoiselle", u:"club-de-nuit-woman-armaf", desc:"Chipre Floral Amadeirado. Topo: Laranja, Bergamota, Toranja e Pêssego. Coração: Rosa, Jasmim, Gerânio e Lichia. Base: Patchouli, Almíscar, Baunilha e Vetiver." },
+  { n:"Club de Nuit Maleka", b:"Armaf", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["floral","frutal","gourmand","citrico","amadeirado"], im:["sofisticado","moderno"], ins:"Very Good Girl | Palatine", u:"club-de-nuit-maleka-armaf", desc:"Floral Frutado Gourmand. Topo: Lichia, Bergamota e Pimenta-rosa. Coração: Íris (Orris) Nobre. Base: Praliné, Ambroxan e Sândalo." },
+  { n:"Essenza Nobile", b:"In The Box", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico","floral"], im:["sofisticado","sedutor","confortavel"], ins:"Vibrato", u:"essenza-nobile-in-the-box", desc:"Cítrico Aromático Amadeirado. Topo: Gengibre, Bergamota, Mandarina, Groselha-preta e Alecrim. Coração: Magnólia, Madeiras Preciosas e Rosa de Damasco. Base: Musk, Âmbar Cristal, Sândalo Indiano, Vetiver, Patchouli e Fava Tonka." },
+  { n:"Citrus Craving", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","esporte"], cl:["quente"], nt:["citrico","amadeirado","aromatico"], im:["sofisticado","moderno","sedutor"], ins:"Eros Energy", u:"citrus-craving-in-the-box", desc:"Cítrico Aromático Amadeirado. Topo: Limão, Laranja-sanguínea, Bergamota Siciliana, Toranja e Lima. Coração: Acordes Aromáticos e Especiados (Frescor de Nicho). Base: Notas Amadeiradas Nobres e Almíscar." },
+  { n:"Rose Fairy", b:"Nuancielo", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["floral","frutal","amadeirado","citrico"], im:["sofisticado","moderno"], ins:"Delina La Rosée", u:"rose-fairy-nuancielo", desc:"Floral Frutado Almiscarado. Topo: Lichia, Pera e Bergamota. Coração: Rosa turca, Óleo de rosa e Peônia. Base: Almíscar branco, Vetiver do Haiti e Notas amadeiradas." },
+  { n:"Real King Absolu", b:"Nuancielo", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["frutal","amadeirado","aromatico"], im:["sofisticado","moderno","sedutor"], ins:"Absolu Aventus", u:"real-king-absolu-nuancielo", desc:"Chipre Frutado Amadeirado. Topo: Toranja, Bergamota, Pimenta Rosa, Groselha Preta, Abacaxi, Noz-moscada, Cravo-da-Índia. Coração: Gengibre, Cidra, Canela, Cardamomo, Rosa. Base: Patchouli, Vetiver, Musgo de Carvalho, Ambroxan, Sândalo, Almíscar, Fava Tonka, Evernil." },
+  { n:"Ner Tamid", b:"Nuancielo", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["oriental","gourmand","amadeirado","citrico","aromatico"], im:["sofisticado","sedutor"], ins:"Grand Soir", u:"ner-tamid-nuancielo", desc:"Ambarado Baunilhado Balsâmico. Topo: Laranja e Ládano. Coração: Lavanda. Base: Âmbar, Cedro, Fava tonka e Baunilha." },
+  { n:"Ada", b:"Nuancielo", g:["feminino"], p:["noite","qualquer"], oc:["trabalho","casual","social"], cl:["moderado","frio"], nt:["floral","gourmand","frutal","amadeirado"], im:["sofisticado","moderno","confortavel"], ins:"Wind Flowers", u:"ada-nuancielo", desc:"Floral Branco Doce. Topo: Jasmim, Flor de Laranjeira e Pêssego. Coração: Jasmim Sambac, Tuberosa e Rosa. Base: Almíscar, Pralinê, Flor de Laranjeira, Sândalo e Íris." },
+  { n:"La Di Da For Him", b:"Arabiyat Prestige", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","gourmand","oriental","citrico"], im:["sofisticado","moderno"], ins:"MYSLF | Y | Stronger With You", u:"la-di-da-for-him-arabiyat-prestige", desc:"Amadeirado Aromático Baunilhado. Topo: Bergamota, Toranja e Gerânio. Coração: Fava Tonka, Notas Aromáticas e Pimenta-preta. Base: Baunilha, Ambergris e Almíscar." },
+  { n:"Attar Al Wesal Gold", b:"Al Wataniah", g:["masculino"], p:["dia","qualquer"], oc:["casual","trabalho","social"], cl:["quente","moderado"], nt:["citrico","floral","amadeirado"], im:["fresco","sofisticado","confortavel"], ins:"Vibrato (Sospiro)", u:"attar-al-wesal-gold-al-wataniah", desc:"Cítrico Floral Amadeirado (Masculino). Fragrância cítrica vibrante com delicadeza floral e fundo amadeirado elegante e discreto; fresca e refinada, versátil para o dia a dia. Topo: Pera, Lavanda, Hortelã, Bergamota e Limão. Coração: Canela, Cominho e Alcaravia. Base: Baunilha Negra, Âmbar, Patchouli e Cedro." },
+  { n:"Sinfonia", b:"JA Essence", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","encontro"], cl:["quente","moderado"], nt:["citrico","frutal","amadeirado"], im:["sofisticado","fresco","confortavel"], ins:"Symphony", u:"sinfonia-ja-essence", desc:"Cítrico Frutado Amadeirado. Topo: Bergamota e Toranja. Coração: Gengibre fresco e Néroli. Base: Almíscares limpos e Âmbar branco." },
+  { n:"Silent Paths", b:"JA Essence", g:["compartilhavel"], p:["noite"], oc:["encontro"], cl:["moderado"], nt:["floral","gourmand","amadeirado","citrico","frutal"], im:["sofisticado","moderno","sedutor"], ins:"Hundred Silent Ways", u:"silent-paths-ja-essence", desc:"Floral Gourmand Almiscarado. Topo: Tuberosa, pêssego e mandarina. Coração: Jasmim, gardênia e orris. Base: Baunilha, sândalo e vetiver." },
+  { n:"Sibéria", b:"JA Essence", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","oriental"], im:["sofisticado","sedutor","confortavel"], ins:"Himalaya", u:"siberia-ja-essence", desc:"Amadeirado Cítrico Almiscarado. Topo: Bergamota da Calábria, toranja e limão siciliano. Coração: Sândalo. Base: Almíscar, âmbar cinzento e cedro." },
+  { n:"Chá", b:"JA Essence", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["quente"], nt:["citrico","amadeirado","aromatico","oriental"], im:["sofisticado","fresco","sedutor"], ins:"Wulòng Chá", u:"cha-ja-essence", desc:"Cítrico Verde Almiscarado. Topo: Bergamota, Laranja, Litsea e Tangerina. Coração: Chá Oolong e Noz-moscada. Base: Figo Mediterrâneo e Almíscar." },
+  { n:"Imaginary Trip", b:"JA Essence", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["citrico","floral","amadeirado"], im:["sofisticado","sedutor"], ins:"Bal d'Afrique", u:"imaginary-trip-ja-essence", desc:"Floral Amadeirado Cítrico. Topo: Bergamota, Tagetes (Cravo-de-defunto) e Agathosma. Coração: Violeta e Cyclamen. Base: Vetiver, Cedro e Almíscar." },
+  { n:"Azm", b:"Paris Corner", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["floral","gourmand","amadeirado","frutal","citrico"], im:["sofisticado","moderno"], ins:"Hundred Silent Ways", u:"azm-paris-corner", desc:"Floral Gourmand Almiscarado. Topo: Pêssego, Pera, Tangerina e Rum. Coração: Tuberosa e Jasmim. Base: Baunilha, Almíscar, Sândalo e Vetiver." },
+  { n:"Hawas Black", b:"Rasasi", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","aromatico","frutal","oriental"], im:["sofisticado","sedutor"], ins:"Hacivat", u:"hawas-black-rasasi", desc:"Cítrico Chipre Amadeirado. Topo: Bergamota, Abacaxi e Toranja. Coração: Patchouli, Cedro e Jasmim. Base: Musgo de carvalho, notas amadeiradas e Âmbar." },
+  { n:"Royal Amber", b:"Orientica", g:["compartilhavel"], p:["qualquer"], oc:["social","encontro"], cl:["moderado"], nt:["citrico","frutal","oriental","gourmand","amadeirado"], im:["sofisticado","fresco","sedutor"], ins:"Erba Pura", u:"royal-amber-orientica", desc:"Cítrico Frutado Ambarado. Topo: Bergamota e notas verdes. Coração: Notas doces, melão, abacaxi e âmbar. Base: Almíscar, notas amadeiradas e baunilha." },
+  { n:"Club de Nuit Intense Man Extrait", b:"Armaf", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["frutal","amadeirado","aromatico","oriental","gourmand"], im:["sofisticado","moderno","sedutor"], ins:"Aventus", u:"club-de-nuit-intense-man-extrait-armaf", desc:"Chipre Frutado Amadeirado. Topo: Abacaxi, bergamota, limão, groselha preta e maçã. Coração: Rosa, jasmim e bétula. Base: Baunilha, almíscar, âmbar cinzento e patchouli." },
+  { n:"Club de Nuit Imperiale", b:"Armaf", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["floral","amadeirado","gourmand","citrico","oriental"], im:["sofisticado","fresco","confortavel"], ins:"Delina Exclusif", u:"club-de-nuit-imperiale-armaf", desc:"Floral Doce Amadeirado. Topo: Lichia, Bergamota e Noz-moscada. Coração: Rosa Turca, Baunilha, Peônia e Almíscar. Base: Baunilha, Cashmeran, Incenso e Cedro." },
+  { n:"Ayka", b:"Rayhaan", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["quente","moderado"], nt:["floral","frutal","amadeirado","citrico"], im:["sofisticado","moderno","fresco"], ins:"Miss Dior Blooming Bouquet | Bright Crystal", u:"ayka-rayhaan", desc:"Floral Frutado Almiscarado. Topo: Peônia, Cítricos e Mandarina. Coração: Osmanthus e Rosa. Base: Sândalo, Patchouli e Pimenta Rosa." },
+  { n:"Club de Nuit Sillage", b:"Armaf", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","social"], cl:["quente"], nt:["citrico","aromatico","amadeirado","floral"], im:["sofisticado","moderno"], ins:"Silver Mountain Water", u:"club-de-nuit-sillage-armaf", desc:"Aromático Cítrico Almiscarado. Topo: Bergamota, Limão, Lima, Groselha-preta, Folha de Violeta e Gengibre. Coração: Rosa, Íris e Jasmim. Base: Ambroxan, Almíscar, Sândalo e Cedro." },
+  { n:"Vulcan Feu", b:"French Avenue", g:["compartilhavel"], p:["noite"], oc:["social"], cl:["moderado"], nt:["frutal","amadeirado","oriental","gourmand","citrico"], im:["sofisticado","fresco"], ins:"God Of Fire", u:"vulcan-feu-french-avenue", desc:"Ambarado Amadeirado Frutado. Topo: Manga, limão, bergamota e gengibre. Coração: Néroli, jasmim e patchouli. Base: Almíscar, baunilha, musgo e âmbar." },
+  { n:"Club de Nuit Urban Elixir", b:"Armaf", g:["masculino"], p:["qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["amadeirado","oriental","citrico","aromatico","floral"], im:["moderno","fresco","confortavel"], ins:"Sauvage EDP | Sauvage Elixir", u:"club-de-nuit-urban-elixir-armaf", desc:"Especiado Amadeirado Ambarado. Topo: Bergamota, Pimenta-rosa, Jasmim e Flor de Laranjeira. Coração: Lavanda, Elemi, Gerânio, Cravo-de-defunto, Vetiver e Açafrão. Base: Ambroxan, Âmbar, Patchouli, Cedro e Labdanum." },
+  { n:"Lion", b:"Rayhaan", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["frutal","oriental","gourmand","citrico","amadeirado"], im:["fresco","sedutor"], ins:"Ultra Male", u:"lion-rayhaan", desc:"Ambarado Frutado Baunilhado. Topo: Lavanda, Pera, Menta e Bergamota. Coração: Canela, Sálvia Esclareia e Cominho. Base: Baunilha, Âmbar, Cedro e Patchouli." },
+  { n:"Yara Moi", b:"Lattafa", g:["feminino"], p:["dia","qualquer"], oc:["casual","encontro"], cl:["moderado","frio"], nt:["floral","frutal","gourmand","oriental","amadeirado"], im:["sedutor","confortavel"], ins:"Perfect Intense", u:"yara-moi-lattafa", desc:"Floral Frutado Gourmand. Topo: Jasmim e Pêssego. Coração: Caramelo e Âmbar. Base: Patchouli e Sândalo." },
+  { n:"Fakhar Gold Extrait", b:"Lattafa", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["amadeirado","oriental","citrico","floral","oud"], im:["sofisticado","moderno","sedutor"], ins:"1 Million Parfum", u:"fakhar-gold-extrait-lattafa", desc:"Couro Especiado Amadeirado. Topo: Toranja, Pimenta-rosa e Cardamomo. Coração: Tuberosa, Notas Solares e Artemísia. Base: Cashmeran, Âmbar, Labdanum e Couro." },
+  { n:"Yara", b:"Lattafa", g:["feminino"], p:["dia","qualquer"], oc:["casual","social","encontro"], cl:["moderado"], nt:["floral","frutal","gourmand","oriental","citrico"], im:["sofisticado","moderno","confortavel"], ins:"Good Girl Blush | Poison Girl", u:"yara-rosa-lattafa", desc:"Floral Frutado Baunilhado. Topo: Bergamota e tangerina. Coração: Peônia e água de rosas. Base: Baunilha e fava tonka." },
+  { n:"Opus Ignis", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["casual","social","encontro"], cl:["moderado"], nt:["floral","frutal","amadeirado","citrico","gourmand"], im:["sofisticado","moderno","confortavel"], ins:"Opera Infernal | Absolu Aventus", u:"opus-ignis-in-the-box", desc:"Frutado Amadeirado Floral. Topo: Bergamota e Abacaxi. Coração: Gerânio e Magnólia. Base: Vetiver, Patchouli, Cedro e Pralinê." },
+  { n:"Lux de Vie", b:"In The Box", g:["feminino"], p:["noite"], oc:["trabalho","social","encontro"], cl:["moderado","frio"], nt:["floral","frutal","gourmand","amadeirado"], im:["sofisticado","sedutor"], ins:"La Vie Est Belle", u:"lux-de-vie-in-the-box", desc:"Floral Gourmand Frutado. Topo: Groselha-preta e Pêra. Coração: Íris, Jasmim e Flor de laranjeira. Base: Pralinê, Baunilha, Patchouli e Fava tonka." },
+  { n:"Terra", b:"In The Box", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","oriental","floral"], im:["sofisticado","moderno"], ins:"Terre d'Hermès", u:"terra-in-the-box", desc:"Amadeirado Especiado Cítrico. Topo: Laranja e toranja. Coração: Pimenta, gerânio (sardinheira) e silex. Base: Vetiver, cedro, patchouli e benjoim." },
+  { n:"Colossus", b:"In The Box", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["floral","oriental","gourmand","citrico","aromatico"], im:["sofisticado","fresco","sedutor"], ins:"Pegasus", u:"colossus-in-the-box", desc:"Ambarado Baunilhado Floral. Topo: Heliotrópio, Cominho e Bergamota. Coração: Amêndoa Amarga, Lavanda e Jasmim. Base: Baunilha, Sândalo e Âmbar." },
+  { n:"Earthy Icy", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["quente"], nt:["citrico","amadeirado","aromatico","oriental"], im:["sofisticado","fresco","confortavel"], ins:"Terre d'Hermès Eau Givrée", u:"earthy-icy-in-the-box", desc:"Cítrico Aromático Amadeirado. Topo: Citron. Coração: Zimbro (Juniper). Base: Pimenta." },
+  { n:"Codice Uno", b:"In The Box", g:["masculino"], p:["noite","qualquer"], oc:["social","encontro"], cl:["quente"], nt:["oriental","gourmand","floral","frutal","amadeirado"], im:["sofisticado","fresco"], ins:"Armani Code Absolu", u:"codice-uno-in-the-box", desc:"Ambarado Especiado Baunilhado. Topo: Mandarina Verde e Maçã. Coração: Noz-moscada, Sementes de Cenoura e Flor de Laranjeira. Base: Rum, Baunilha, Camurça, Fava Tonka e Notas Amadeiradas." },
+  { n:"Stant Aquae", b:"In The Box", g:["compartilhavel"], p:["dia","qualquer"], oc:["encontro"], cl:["quente"], nt:["citrico","gourmand","floral","aquatico"], im:["sofisticado","fresco","sedutor"], ins:"Virgin Island Water", u:"stant-aquae-in-the-box", desc:"Cítrico Tropical Marinho. Topo: Limão, bergamota e frutas tropicais. Coração: Leite de coco, água de coco, jasmim e flores brancas. Base: Fava tonka e musk branco." },
+  { n:"Sauvegy", b:"In The Box", g:["masculino"], p:["noite"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","aromatico","floral","oriental"], im:["sofisticado","moderno","sedutor"], ins:"Sauvage", u:"sauvegy-in-the-box", desc:"Aromático Cítrico Amadeirado. Topo: Bergamota da Calábria e Pimenta. Coração: Pimenta de Szechuan, Lavanda, Pimenta-rosa, Vetiver, Patchouli, Gerânio e Elemi. Base: Ambroxan, Cedro e Ládano." },
+  { n:"Homine Optimum", b:"In The Box", g:["masculino"], p:["noite","qualquer"], oc:["social","encontro"], cl:["quente"], nt:["aromatico","oriental","gourmand","floral","amadeirado"], im:["sofisticado","moderno"], ins:"Le Male Le Parfum", u:"homine-optimum-in-the-box", desc:"Ambarado Baunilhado Aromático. Topo: Cardamomo. Coração: Lavanda e Íris. Base: Baunilha, Notas Orientais e Notas Amadeiradas." },
+  { n:"The Barbarian", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","citrico"], im:["sofisticado","moderno","fresco"], ins:"Viking", u:"the-barbarian-in-the-box", desc:"Aromático Especiado Amadeirado. Topo: Bergamota, limão e pimenta-rosa. Coração: Hortelã, pimenta preta e cravo. Base: Sândalo, vetiver e patchouli." },
+  { n:"Deep Dark Water", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["quente","moderado"], nt:["amadeirado","aromatico","aquatico","citrico"], im:["sofisticado","fresco","confortavel"], ins:"Acqua di Giò Profumo", u:"deep-dark-water-in-the-box", desc:"Aquático Amadeirado Aromático. Topo: Bergamota e Acordes Marinhos. Coração: Alecrim e Sálvia Esclareia. Base: Notas Amadeiradas e Vetiver." },
+  { n:"Aurum Parfum", b:"In The Box", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado","frio"], nt:["oriental","gourmand","amadeirado","floral","oud"], im:["sofisticado","moderno","fresco"], ins:"1 Million Parfum", u:"aurum-parfum-in-the-box", desc:"Couro Ambarado Doce. Topo: Tuberosa, Cashmere, Sal e Pinheiro. Coração: Couro Camurça. Base: Ambergris, Láudano e Óleo de Monoi." },
+  { n:"Nero Del Porto", b:"In The Box", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","esporte"], cl:["quente"], nt:["citrico","floral","aromatico","oriental"], im:["sofisticado","fresco"], ins:"Neroli Portofino", u:"nero-del-porto-in-the-box", desc:"Cítrico Floral Aromático. Topo: Cítricos. Coração: Flor de laranjeira, Jasmim, Pitosporo e Néroli. Base: Âmbar, Ambreta e Angélica." },
+  { n:"Intensity", b:"In The Box", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["frio"], nt:["floral","amadeirado","aromatico","frutal"], im:["sofisticado","moderno"], ins:"Dior Homme Intense", u:"intensity-in-the-box", desc:"Amadeirado Floral Almiscarado. Topo: Lavanda. Coração: Íris, Ambreta e Pêra. Base: Cedro da Virgínia e Vetiver." },
+  { n:"Sweet From Heaven", b:"In The Box", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["gourmand","oriental","amadeirado"], im:["sofisticado","sedutor","confortavel"], ins:"Angels' Share", u:"sweet-from-heaven-in-the-box", desc:"Gourmand Doce Baunilhado. Topo: Conhaque. Coração: Canela, fava tonka e carvalho. Base: Pralinê, baunilha e sândalo." },
+  { n:"Profumo Di Salerno", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho"], cl:["quente"], nt:["citrico","frutal","aromatico","floral"], im:["sofisticado","fresco"], ins:"Mandarino di Amalfi", u:"profumo-di-salerno-in-the-box", desc:"Cítrico Aromático Frutado. Topo: Toranja, limão, manjericão, estragão, menta e groselha-preta. Coração: Flor de laranjeira, shiso, jasmim, coentro, pimenta-preta e sálvia esclareia. Base: Musk, âmbar, civet, labdanum e vetiver." },
+  { n:"Me And I", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico"], im:["sofisticado","moderno","natural"], ins:"MYSLF EDP", u:"me-and-i-in-the-box", desc:"Amadeirado Cítrico Aromático. Topo: Bergamota da Calábria e Bergamota. Coração: Flor de laranjeira da Tunísia. Base: Ambrofix™ e Patchouli." },
+  { n:"Irish Green Man", b:"In The Box", g:["masculino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","floral"], im:["sofisticado","sedutor"], ins:"Green Irish Tweed", u:"irish-green-man-in-the-box", desc:"Verde Amadeirado Almiscarado. Topo: Lúcia-lima (Verbena) e Íris. Coração: Folha de Violeta. Base: Ambergris e Sândalo." },
+  { n:"Island Vanilla Dunes", b:"Khadlaj", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["quente"], nt:["amadeirado","gourmand","oriental","citrico","floral"], im:["sofisticado","sedutor"], ins:"Althair", u:"island-vanilla-dunes-khadlaj", desc:"Gourmand Baunilhado Amadeirado. Topo: Baunilha, Canela, Cardamomo e Bergamota. Coração: Flor de laranjeira e Madeira Guaiac. Base: Praliné, Âmbar e Almíscar." },
+  { n:"Fakhar Rose", b:"Lattafa", g:["feminino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado","frio"], nt:["floral","amadeirado","gourmand"], im:["sofisticado","moderno"], ins:"L'Interdit", u:"fakhar-rose-lattafa", desc:"Floral Amadeirado Almiscarado. Topo: Frutas, Lírio, Romã e Aldeídos. Coração: Tuberosa, Jasmim, Gardênia, Ylang-ylang, Rosa, Madressilva e Peônia. Base: Baunilha, Almíscar Branco, Sândalo e Ambroxan." },
+  { n:"9PM", b:"Afnan", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["oriental","gourmand","citrico","floral","frutal"], im:["sofisticado","moderno","confortavel"], ins:"Ultra Male", u:"9pm-afnan", desc:"Ambarado Doce Baunilhado. Topo: Bergamota, Lavandin, Canela e Maçã. Coração: Muguet (Lírio-do-vale) e Flor de Laranjeira. Base: Patchouli, Âmbar, Baunilha e Fava Tonka." },
+  { n:"Yara Candy", b:"Lattafa", g:["feminino"], p:["dia","qualquer"], oc:["casual"], cl:["moderado","frio"], nt:["floral","frutal","gourmand","oriental","amadeirado"], im:["confortavel"], ins:"Prada Candy Gloss", u:"yara-candy-lattafa", desc:"Floral Frutado Gourmand. Topo: Groselha Preta e Tangerina Verde. Coração: Doce de Morango e Gardênia. Base: Baunilha, Musk, Âmbar e Sândalo." },
+  { n:"Club de Nuit Bling", b:"Armaf", g:["masculino"], p:["qualquer"], oc:["casual","social"], cl:["moderado"], nt:["citrico","aromatico","aquatico","gourmand"], im:["sofisticado","fresco","sedutor"], ins:"Elysium | Bleu", u:"club-de-nuit-bling-armaf", desc:"Aromático Cítrico Aquático. Topo: Notas Cítricas Efervescentes. Coração: Acordes Florais Brilhantes (Flower Prism e Stardust). Base: Madeiras Aveludadas e Baunilha." },
+  { n:"Asad", b:"Lattafa", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado","frio"], nt:["amadeirado","oriental","frutal","gourmand","floral"], im:["sofisticado","moderno"], ins:"Boss Bottled | Sauvage Elixir", u:"asad-lattafa", desc:"Ambarado Especiado Amadeirado. Topo: Pimenta-preta, Abacaxi e Tabaco. Coração: Patchouli, Café e Íris. Base: Baunilha, Âmbar, Madeira Seca, Benjoim e Labdanum." },
+  { n:"Club de Nuit Iconic", b:"Armaf", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico"], im:["sofisticado","moderno","confortavel"], ins:"Blue Iconic", u:"club-de-nuit-iconic-armaf", desc:"Amadeirado Aromático Cítrico. Topo: Notas Cítricas Efervescentes e Refrescantes. Coração: Acordes Aromáticos e Especiados Frios. Base: Madeiras Nobres e Notas Resinosas." },
+  { n:"Yara Tous", b:"Lattafa", g:["feminino"], p:["dia","qualquer"], oc:["casual","social"], cl:["moderado"], nt:["floral","frutal","amadeirado","gourmand","citrico"], im:["sofisticado","moderno","fresco"], ins:"Fame", u:"yara-tous-lattafa", desc:"Floral Frutado Amadeirado. Topo: Manga e bergamota. Coração: Jasmim e olíbano. Base: Baunilha e sândalo." },
+  { n:"Club de Nuit Millestone", b:"Armaf", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["quente"], nt:["citrico","amadeirado","aquatico","floral"], im:["sofisticado","sedutor","confortavel"], ins:"Millésime Impérial", u:"club-de-nuit-millestone-armaf", desc:"Aquático Cítrico Amadeirado. Topo: Notas Marinhas, Sal Marinho e Frutas Vermelhas. Coração: Bergamota, Tangerina, Limão Siciliano, Íris e Jasmim. Base: Notas Marinhas, Almíscar, Sândalo e Madeiras Nobres." },
+  { n:"Turathi Electric", b:"Afnan", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["quente"], nt:["floral","frutal","amadeirado","oriental","gourmand"], im:["fresco","sedutor","natural"], ins:"Blue Talisman", u:"turathi-electric-afnan", desc:"Floral Frutado Amadeirado. Topo: Pera, Toranja Rosa, Mandarina e Bergamota. Coração: Flor de Laranjeira, Maçã e Cedro. Base: Musk, Âmbar e Baunilha." },
+  { n:"Emeer", b:"Lattafa", g:["compartilhavel"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","citrico"], im:["sofisticado","moderno"], ins:"Town and Country", u:"emeer-lattafa", desc:"Aromático Amadeirado Especiado. Topo: Limão, Bergamota, Sálvia Esclareia e Zimbro. Coração: Chá Branco, Sândalo, Cardamomo e Olíbano. Base: Ambergris, Cedro, Cashmeran e Patchouli." },
+  { n:"Tiara Pink", b:"Al Wataniah", g:["feminino"], p:["noite"], oc:["casual","social"], cl:["frio"], nt:["floral","amadeirado","oriental","gourmand","citrico"], im:["sofisticado"], ins:"Delina | Chloé", u:"tiara-pink-al-wataniah", desc:"Floral Amadeirado Ambarado. Topo: Bergamota e Pera. Coração: Rosa Turca, Oud e Incenso. Base: Madeiras Nobres, Âmbar e Baunilha." },
+  { n:"Oud For Glory", b:"Lattafa", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["amadeirado","oriental","aromatico","oud"], im:["sofisticado","sedutor"], ins:"Initio Oud for Greatness", u:"oud-for-glory-lattafa", desc:"Amadeirado Ambarado Resinoso. Topo: Açafrão, Noz-moscada e Lavanda. Coração: Oud (Agarwood) e Patchouli. Base: Oud, Patchouli e Almíscar." },
+  { n:"Fakhar Black", b:"Lattafa", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["frutal","amadeirado","aromatico","citrico","gourmand"], im:["sofisticado","moderno","natural"], ins:"Y EDP", u:"fakhar-black-lattafa", desc:"Aromático Frutado Amadeirado. Topo: Maçã, Bergamota e Gengibre. Coração: Lavanda, Sálvia, Zimbro e Gerânio. Base: Fava Tonka, Cedro, Amberwood e Vetiver." },
+  { n:"Khamrah", b:"Lattafa", g:["compartilhavel"], p:["noite"], oc:["encontro"], cl:["frio"], nt:["gourmand","oriental","amadeirado","citrico","floral"], im:["sofisticado","moderno","sedutor"], ins:"Angel's Share especiado", u:"khamrah-lattafa", desc:"Gourmand Especiado Baunilhado. Topo: Canela, Noz-moscada e Bergamota. Coração: Tâmara, Praliné, Tuberosa e Mahonial. Base: Baunilha, Fava Tonka, Amberwood, Mirra, Benjoim e Akigalawood." },
+  { n:"Island", b:"Khadlaj", g:["masculino"], p:["dia","qualquer"], oc:["social","encontro"], cl:["quente"], nt:["frutal","amadeirado","oriental","gourmand","floral"], im:["sofisticado","sedutor"], ins:"Le Beau Le Parfum", u:"island-khadlaj", desc:"Amadeirado Frutado Ambarado. Topo: Abacaxi, Íris, Gengibre e Cipreste. Coração: Coco e Notas Amadeiradas. Base: Fava Tonka, Sândalo, Âmbar e Ambergris." },
+  { n:"Asad Elixir", b:"Lattafa", g:["masculino"], p:["noite"], oc:["social"], cl:["moderado"], nt:["amadeirado","oriental","gourmand","citrico"], im:["sofisticado","fresco","sedutor"], ins:"Boss Bottled Elixir", u:"asad-elixir-lattafa", desc:"Ambarado Amadeirado Doce. Topo: Pimenta-rosa, Açafrão e Toranja. Coração: Tabaco, Baunilha e Cedro. Base: Âmbar Claro, Olíbano, Patchouli e Cashmeran." },
+  { n:"The Kingdom", b:"Lattafa", g:["masculino"], p:["noite"], oc:["casual","social"], cl:["moderado"], nt:["aromatico","oriental","gourmand","floral"], im:["sedutor"], ins:"Le Male Elixir", u:"the-kingdom-lattafa", desc:"Ambarado Baunilhado Aromático. Topo: Lavanda, hortelã e sálvia. Coração: Baunilha, tabaco e flor de laranjeira. Base: Fava tonka, benjoim e ládano." },
+  { n:"Domus", b:"Nuancielo", g:["masculino"], p:["noite"], oc:["social"], cl:["moderado","frio"], nt:["amadeirado","oriental","gourmand"], im:["sofisticado","moderno","fresco"], ins:"Althair", u:"domus-nuancielo", desc:"Ambarado Amadeirado Baunilhado. Topo: Combinação cítrica e especiada (características da inspiração Althair). Coração: Notas especiadas e cremosas. Base: Âmbar, baunilha, notas amadeiradas nobres." },
+  { n:"Harmonie", b:"Nuancielo", g:["feminino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["floral","frutal","amadeirado","gourmand","citrico"], im:["sofisticado","moderno"], ins:"Idôle", u:"harmonie-nuancielo", desc:"Floral Almiscarado Frutado. Topo: Pera e Bergamota. Coração: Rosa Turca, Rosa de Maio e Jasmim Indiano. Base: Almíscar Branco e Baunilha." },
+  { n:"Ayael", b:"Nuancielo", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["moderado","frio"], nt:["floral","amadeirado","oriental","gourmand","frutal"], im:["sofisticado","moderno","confortavel"], ins:"Musk Therapy", u:"ayael-nuancielo", desc:"Almiscarado Floral Amadeirado. Topo: Mandarina e Cassis. Coração: Jasmim Sambac e Davana. Base: Almíscar Branco, Âmbar Cinzento e Baunilha." },
+  { n:"Shiny", b:"Nuancielo", g:["feminino"], p:["noite"], oc:["trabalho","encontro"], cl:["quente","moderado"], nt:["floral","frutal","amadeirado","aromatico","citrico"], im:["sofisticado","moderno","fresco"], ins:"Nomade Chloé", u:"shiny-nuancielo", desc:"Chipre Floral Frutado. Topo: Ameixa amarela, bergamota, limão siciliano e laranja. Coração: Frésia, jasmim, pêssego e rosa. Base: Musgo de carvalho, madeira de âmbar, patchouli, sândalo e almíscar branco." },
+  { n:"Majesty", b:"Nuancielo", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["floral","frutal","amadeirado","aromatico","citrico"], im:["sofisticado","moderno","sedutor"], ins:"Aventus For Her", u:"majesty-nuancielo", desc:"Chipre Frutado Floral. Topo: Patchouli, Maçã verde, Bergamota, Limão, Pimenta rosa e Violeta. Coração: Sândalo, Rosa, Styrax e Almíscar. Base: Pêssego, Cassis, Lilás, Ylang ylang e Âmbar." },
+  { n:"White Rose", b:"Nuancielo", g:["feminino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado","frio"], nt:["floral","amadeirado","gourmand"], im:["sofisticado","fresco"], ins:"Love In White", u:"white-rose-nuancielo", desc:"Floral Almiscarado Amadeirado. Topo: Casca de laranja. Coração: Íris, magnólia, rosa e narciso. Base: Baunilha, sândalo e âmbar gris." },
+  { n:"Lemon & Neroli", b:"Nuancielo", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente"], nt:["citrico","floral","aromatico"], im:["sofisticado","fresco"], ins:"Neroli Portofino", u:"lemon-neroli-nuancielo", desc:"Cítrico Aromático Floral. Topo: Limão siciliano, Lavanda, Alecrim, Laranja amarga, Bergamota, Tangerina e Mirtilo. Coração: Néroli, Flor de laranjeira, Pitósporo e Jasmim. Base: Ambreta, Angélica e Âmbar." },
+  { n:"Pear & Vanilla", b:"Nuancielo", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["frutal","oriental","gourmand","amadeirado"], im:["sofisticado","fresco"], ins:"La Belle", u:"pear-vanilla-nuancielo", desc:"Ambarado Baunilhado Frutado. Topo: Pera. Coração: Vetiver. Base: Baunilha." },
+  { n:"Wild", b:"Nuancielo", g:["masculino"], p:["noite"], oc:["trabalho"], cl:["moderado"], nt:["aromatico","oriental","citrico","amadeirado","floral"], im:["sofisticado","fresco","sedutor"], ins:"Sauvage", u:"wild-nuancielo", desc:"Aromático Ambarado Especiado. Topo: Bergamota da Calábria e pimenta. Coração: Lavanda, gerânio, pimenta de Sichuan e vetiver. Base: Ambroxan, cedro e patchouli." },
+  { n:"Italian Soul", b:"Nuancielo", g:["masculino"], p:["qualquer"], oc:["trabalho","social"], cl:["moderado"], nt:["citrico","aromatico","oriental","amadeirado","floral"], im:["sofisticado","fresco","sedutor"], ins:"Renaissance", u:"italian-soul-nuancielo", desc:"Cítrico Aromático Verde. Topo: Limão de Amalfi, tangerina e bergamota. Coração: Hortelã, lírio-do-vale, rosa e petitgrain. Base: Almíscar, cedro da Virgínia, âmbar e patchouli." },
+  { n:"Wild Elixir", b:"Nuancielo", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["amadeirado","oriental","aromatico","citrico"], im:["sofisticado","moderno"], ins:"Sauvage Elixir", u:"wild-elixir-nuancielo", desc:"Especiado Ambarado Amadeirado. Topo: Canela, noz-moscada, cardamomo e toranja. Coração: Lavanda. Base: Alcaçuz, sândalo, patchouli e âmbar." },
+  { n:"Hills", b:"Nuancielo", g:["masculino"], p:["noite","qualquer"], oc:["social","encontro"], cl:["quente"], nt:["amadeirado","oriental"], im:["sofisticado"], ins:"The One for Men", u:"hills-nuancielo", desc:"Amadeirado Especiado Ambarado. Topo: Toranja, Coentro, Manjericão. Coração: Flor de Laranjeira, Cardamomo, Gengibre. Base: Tabaco, Âmbar, Cedro." },
+  { n:"Gálata", b:"Nuancielo", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["quente","moderado"], nt:["citrico","frutal","amadeirado"], im:["sofisticado","moderno","natural"], ins:"Cedrat Boisé", u:"galata-nuancielo", desc:"Cítrico Frutado Amadeirado. Topo: Limão Siciliano, Groselha Preta, Bergamota, Notas Especiadas. Coração: Notas Frutadas, Folha de Patchouli, Jasmim Aquático. Base: Cedro, Couro, Sândalo, Baunilha, Almíscar Branco, Musgo." },
+  { n:"Mystic Fairy", b:"Nuancielo", g:["feminino"], p:["qualquer"], oc:["social"], cl:["moderado"], nt:["floral","amadeirado","gourmand","oriental","citrico"], im:["sofisticado","moderno","confortavel"], ins:"Delina Exclusif", u:"mystic-fairy-nuancielo", desc:"Floral Doce Amadeirado. Topo: Lichia, Pêra e Bergamota. Coração: Rosa turca, Oud (Agarwood) e Incenso. Base: Baunilha, Âmbar, Fava tonka e Notas amadeiradas." },
+  { n:"Caribbean", b:"Nuancielo", g:["compartilhavel"], p:["dia","qualquer"], oc:["casual"], cl:["quente"], nt:["citrico","gourmand"], im:["sofisticado","fresco","sedutor"], ins:"Virgin Island Water", u:"caribbean-nuancielo", desc:"Cítrico Tropical Doce. Topo: Lima, Coco, Bergamota Branca e Tangerina Italiana. Coração: Gengibre, Ylang Ylang, Jasmim Indiano e Hibisco. Base: Cana-de-açúcar, Rum Branco e Almíscar." },
+  { n:"Like A Boss", b:"Nuancielo", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","aromatico","oriental","floral"], im:["sofisticado","moderno"], ins:"Bleu EDT", u:"like-a-boss-nuancielo", desc:"Amadeirado Aromático Cítrico. Topo: Toranja, Limão, Pimenta rosa e Hortelã. Coração: Iso E Super, Gengibre, Jasmim e Noz-moscada. Base: Incenso, Patchouli, Vetiver, Cedro, Sândalo, Ládano e Almíscar branco." },
+  { n:"Alpha", b:"Nuancielo", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["citrico","aromatico","amadeirado","oriental","gourmand"], im:["sofisticado","moderno","confortavel"], ins:"Allure Homme Sport", u:"alpha-nuancielo", desc:"Cítrico Aromático Almiscarado. Topo: Laranja, Notas Marinhas, Aldeídos e Mandarina Vermelha. Coração: Pimenta, Néroli e Cedro. Base: Baunilha, Almíscar Branco, Fava Tonka, Âmbar, Vetiver e Elemi." },
+  { n:"Jocker", b:"Nuancielo", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","gourmand","floral"], im:["moderno","fresco","sedutor"], ins:"212 VIP Men Party Fever", u:"jocker-nuancielo", desc:"Amadeirado Especiado Aromático. Topo: Cítricos, maçã vermelha e gengibre. Coração: Cannabis, gerânio, frésia, tamarindo e bagas de zimbo. Base: Fava tonka, musk, vetiver, cedro e olíbano." },
+  { n:"Eliora", b:"Nuancielo", g:["feminino"], p:["noite","qualquer"], oc:["trabalho","social"], cl:["moderado","frio"], nt:["floral","oriental"], im:["sofisticado","moderno","sedutor"], ins:"Rose de Chine", u:"eliora-nuancielo", desc:"Floral Ambarado Especiado. Topo: Peônia Chinesa. Coração: Rosa. Base: Mirra e Ládano." },
+  { n:"Pure Flowers", b:"Nuancielo", g:["feminino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado","frio"], nt:["floral","amadeirado","oriental","frutal"], im:["sofisticado","fresco"], ins:"Chloé EDP", u:"pure-flowers-nuancielo", desc:"Floral Amadeirado Atalcado. Topo: Peônia, Frésia e Lichia. Coração: Rosa, Lírio-do-vale e Magnólia. Base: Âmbar e Cedro da Virgínia." },
+  { n:"Fairy", b:"Nuancielo", g:["feminino"], p:["qualquer"], oc:["social","encontro"], cl:["moderado"], nt:["floral","frutal","amadeirado","gourmand","citrico"], im:["sofisticado","moderno","sedutor"], ins:"Delina", u:"fairy-nuancielo", desc:"Floral Frutado Almiscarado. Topo: Lichia, Ruibarbo, Noz-moscada e Bergamota. Coração: Rosa Turca, Peônia, Baunilha, Musk e Petalia. Base: Cashmeran, Vetiver e Cedro." },
+  { n:"Feme Side", b:"Nuancielo", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","social"], cl:["quente"], nt:["floral","amadeirado","gourmand","citrico"], im:["sofisticado","moderno","fresco"], ins:"Valaya", u:"feme-side-nuancielo", desc:"Floral Almiscarado Amadeirado. Topo: Aldeídos, Pêssego Branco, Mandarina e Bergamota. Coração: Vetiver, Flor de Laranjeira, Mahonia e Lírio-do-vale. Base: Musk, Ambroxan, Akigalawood e Baunilha." },
+  { n:"Feme Side Exclusif", b:"Nuancielo", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","social"], cl:["quente"], nt:["floral","amadeirado","gourmand","citrico"], im:["sofisticado","moderno","fresco"], ins:"Valaya Exclusif", u:"feme-side-exclusif-nuancielo", desc:"Floral Amadeirado Almiscado. Topo: Amêndoa, Mandarina, Bergamota. Coração: Notas Atalcadas, Flor de Laranjeira, Lírio-do-Vale, Lótus. Base: Baunilha, Ambroxan, Akigalawood, Sândalo, Almíscar Branco, Heliotrópio." },
+  { n:"Noam", b:"Nuancielo", g:["feminino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["floral","amadeirado","gourmand","citrico"], im:["sofisticado","moderno"], ins:"Eladaria", u:"nom-nuancielo", desc:"Floral Almiscarado Amadeirado. Topo: Pimenta rosa, Bergamota e Mandarina. Coração: Rosa, Notas atalcadas, Peônia e Lírio-do-vale. Base: Ambroxan, Musk, Baunilha e Madeira cashmere." },
+  { n:"Heaven", b:"Maison Viégas", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["quente"], nt:["citrico","amadeirado","aromatico","oriental"], im:["sofisticado","moderno","confortavel"], ins:"Imagination", u:"heaven-maison-viegas", desc:"Cítrico Aromático Amadeirado. Topo: Cidra (Citron), Bergamota da Calábria e Laranja Siciliana. Coração: Néroli da Tunísia, Gengibre e Canela do Ceilão. Base: Chá preto chinês, Ambroxan, Madeira Guaiac e Olíbano." },
+  { n:"Grand Tygar", b:"Maison Viégas", g:["compartilhavel"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","oriental"], im:["sofisticado","fresco"], ins:"Tygar", u:"grand-tygar-maison-viegas", desc:"Cítrico Ambarado Amadeirado. Topo: Toranja (Grapefruit), Bergamota e Mandarina. Coração: Gengibre, Sementes de Ambrette e Patchouli. Base: Âmbar, Vetiver e Madeiras Aveludadas." },
+  { n:"Legacy", b:"Maison Viégas", g:["masculino"], p:["noite"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["citrico","aromatico","floral","amadeirado"], im:["sofisticado","sedutor"], ins:"Elysium Pour Homme Parfum", u:"legacy-maison-viegas", desc:"Aromático Fougère Cítrico. Topo: Toranja, Tomilho, Limão, Bergamota, Gálbano, Artemísia e Lima. Coração: Vetiver, Lírio-do-vale, Óleo de cipriol (nagarmota), Pimenta rosa, Bagas de zimbro, Groselha-preta, Jasmim, Maçã, Rosa e Cedro. Base: Couro, Benjoim, Ládano, Baunilha e Âmbar cinzento." },
+  { n:"Jazz Master", b:"Maison Viégas", g:["masculino"], p:["noite","qualquer"], oc:["social","encontro"], cl:["quente","frio"], nt:["amadeirado","oriental","gourmand","oud"], im:["sofisticado","sedutor"], ins:"Jazz Club", u:"jazz-master-maison-viegas", desc:"Couro Especiado Amadeirado. Topo: Pimenta Rosa e Rum. Coração: Couro e Folha de Tabaco. Base: Musk, Folha de Tabaco, Sândalo e Baunilha." },
+  { n:"Gin Tonic", b:"Maison Viégas", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["quente"], nt:["citrico","aromatico","oriental","amadeirado","floral"], im:["sofisticado","sedutor","confortavel"], ins:"GNTONIC", u:"gin-tonic-maison-viegas", desc:"Ambarado Aromático Cítrico. Topo: Laranja amarga, Pimenta rosa, Água tônica, Gengibre, Lima, Hortelã, Gin e Especiarias. Coração: Lírio-do-vale, Flor de laranjeira, Noz-moscada e Cedro. Base: Sândalo, Almíscar branco, Vetiver, Âmbar e Musgo." },
+  { n:"Strategy", b:"Lab8", g:["compartilhavel"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["amadeirado","oriental","gourmand","frutal"], im:["sofisticado","fresco","confortavel"], ins:"Queening", u:"strategy-lab8", desc:"Ambarado Amadeirado Baunilhado. Topo: Flor de algodão, maçã e cipreste. Coração: Raiz de orris, rum e açafrão. Base: Baunilha, coco e almíscar." },
+  { n:"Effervescent Summer", b:"Lab8", g:["compartilhavel"], p:["dia","qualquer"], oc:["casual","social"], cl:["quente"], nt:["frutal","amadeirado","citrico"], im:["sofisticado","sedutor"], ins:"God of Fire | Vibrato", u:"effervescent-summer-lab8", desc:"Frutado Amadeirado Almiscarado. Topo: Limão siciliano, manga, gengibre e frutas vermelhas. Coração: Flores brancas, cedro e cumarina. Base: Agarwood (Oud), almíscar, âmbar branco e nagarmota." },
+  { n:"Effervescent", b:"Lab8", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","aromatico","oriental","floral"], im:["sofisticado","moderno","confortavel"], ins:"Vibrato", u:"effervescent-lab8", desc:"Cítrico Aromático Amadeirado. Topo: Toranja, Bergamota, Jasmim e Magnólia. Coração: Gengibre, Notas Herbais e Notas Atalcadas. Base: Almíscar, Cedro, Âmbar, Patchouli e Raiz de Orris." },
+  { n:"Vision", b:"Lab8", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","encontro"], cl:["quente"], nt:["citrico","amadeirado","aromatico","oriental"], im:["sofisticado","sedutor","confortavel"], ins:"Imagination", u:"vision-lab8", desc:"Cítrico Aromático Amadeirado. Topo: Cidra, Bergamota, Laranja Siciliana. Coração: Néroli, Gengibre, Canela do Ceilão. Base: Chá Preto, Âmbar, Madeira Guaiac, Olíbano." },
+  { n:"DOM 8", b:"Lab8", g:["masculino"], p:["noite"], oc:["trabalho","social"], cl:["frio"], nt:["amadeirado","oriental","floral","gourmand","aromatico"], im:["sofisticado","sedutor"], ins:"Dior Homme Parfum", u:"dom-8-lab8", desc:"Amadeirado Atalcado Ambarado. Topo: Lavanda, Limão Siciliano, Cardamomo. Coração: Íris, Violeta, Fava Tonka. Base: Patchouli, Vetiver, Âmbar." },
+  { n:"Jobs Intense", b:"Lab8", g:["masculino"], p:["qualquer"], oc:["trabalho","casual","social"], cl:["moderado"], nt:["frutal","amadeirado","oriental","gourmand","citrico"], im:["sofisticado","natural"], ins:"Hugo Boss Bottled", u:"jobs-intense-lab8", desc:"Amadeirado Frutado Especiado. Topo: Maçã, Flor de laranjeira e Bergamota. Coração: Canela, Cravo-da-índia, Gerânio, Cardamomo e Lavanda. Base: Baunilha, Sândalo, Cumarina, Cedro e Vetiver." },
+  { n:"Diamant", b:"Lab8", g:["feminino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado","frio"], nt:["floral","amadeirado","oriental","frutal"], im:["sofisticado","moderno"], ins:"Chloé EDP", u:"diamant-lab8", desc:"Floral Amadeirado Atalcado. Topo: Peônia, lichia e frésia. Coração: Rosa, lírio do vale e magnólia. Base: Cedro da Virgínia e âmbar." },
+  { n:"Enigma Perfeito", b:"Lab8", g:["feminino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["floral","gourmand","oriental","citrico","frutal"], im:["sofisticado","moderno","confortavel"], ins:"Paradoxe", u:"enigma-perfeito-lab8", desc:"Floral Doce Baunilhado. Topo: Pera, Tangerina e Bergamota. Coração: Flor de Laranjeira, Néroli e Jasmim. Base: Baunilha, Âmbar, Almíscar Branco e Benjoim." },
+  { n:"Volcano", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["casual","esporte"], cl:["quente"], nt:["amadeirado","aromatico","aquatico","floral","frutal"], im:["moderno","fresco","confortavel"], ins:"Polo Blue", u:"volcano-thera-cosmeticos", desc:"Aromático Aquático Amadeirado. Topo: Pepino, Melão e Tangerina. Coração: Manjericão, Sálvia e Gerânio. Base: Almíscar, Camurça e Notas Amadeiradas." },
+  { n:"Effie", b:"Thera Cosméticos", g:["feminino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["floral","amadeirado","oriental","gourmand","citrico"], im:["sofisticado","fresco","sedutor"], ins:"Coco Mademoiselle", u:"effie-thera-cosmeticos", desc:"Floral Amadeirado Ambarado. Topo: Bergamota e Laranja. Coração: Jasmim e Rosa. Base: Baunilha, Patchouli, Vetiver e Musk." },
+  { n:"Amórgos", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual","social"], cl:["moderado"], nt:["citrico","amadeirado","aromatico","oriental"], im:["sofisticado","moderno","confortavel"], ins:"Bleu", u:"amorgos-thera-cosmeticos", desc:"Amadeirado Cítrico Aromático. Topo: Pimenta Rosa, Limão, Toranja e Gengibre. Coração: Toranja, Cedro, Labdanum e Vetiver. Base: Incenso, Sândalo, Almíscar e Patchouli." },
+  { n:"Bose", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","casual"], cl:["moderado"], nt:["amadeirado","oriental","citrico","aromatico"], im:["sofisticado","moderno","confortavel"], ins:"Hugo Boss Bottled", u:"bose-thera-cosmeticos", desc:"Amadeirado Especiado Ambarado. Topo: Bergamota, Gengibre, Limão e Verbena. Coração: Elemi, Pimenta Preta, Cardamomo e Cedro. Base: Patchouli, Musk e Acorde Ambarado." },
+  { n:"Líber", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["amadeirado","aromatico","frutal","citrico","floral"], im:["sofisticado","moderno"], ins:"Y EDP", u:"liber-thera-cosmeticos", desc:"Aromático Amadeirado Fougère. Topo: Bergamota, Aldeídos, Gengibre, Limão siciliano e Hortelã. Coração: Folha de violeta, Sálvia, Gerânio, Maçã e Abacaxi. Base: Almíscar, Ambar gris, Incenso, Bálsamo de abeto, Cedro e Vetiver." },
+  { n:"Dhébora", b:"Thera Cosméticos", g:["feminino"], p:["noite","qualquer"], oc:["social","encontro"], cl:["quente"], nt:["floral","gourmand"], im:["sofisticado","moderno","sedutor"], ins:"Good Girl", u:"dhebora-thera-cosmeticos", desc:"Floral Doce Gourmand. Topo: Amêndoa e Café. Coração: Jasmim Sambac e Tuberosa. Base: Fava Tonka e Cacau." },
+  { n:"Joás", b:"Thera Cosméticos", g:["feminino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado","frio"], nt:["floral","frutal","amadeirado","oriental"], im:["sofisticado","moderno"], ins:"212 VIP Rosé", u:"joas-thera-cosmeticos", desc:"Floral Frutado Almiscarado. Topo: Pimenta Rosa. Coração: Flor de Pêssego. Base: Notas Amadeiradas, Almíscar Branco e Âmbar." },
+  { n:"Iraklia", b:"Thera Cosméticos", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["moderado","frio"], nt:["floral","frutal","gourmand","amadeirado"], im:["sofisticado","sedutor"], ins:"La Vie Est Belle", u:"iraklia-thera-cosmeticos", desc:"Gourmand Frutado Floral. Topo: Cassis (Groselha preta) e Pera. Coração: Íris, Jasmim e Flor de Laranjeira. Base: Patchouli, Fava Tonka, Baunilha e Pralinê." },
+  { n:"Adisa", b:"Thera Cosméticos", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","esporte"], cl:["moderado"], nt:["citrico","frutal","aromatico","oriental","amadeirado"], im:["sofisticado","moderno","confortavel"], ins:"Light Blue", u:"adisa-thera-cosmeticos", desc:"Cítrico Frutado Verde. Topo: Maçã Verde e Cedro. Coração: Jasmim e Bambu. Base: Cedro, Musk (Almíscar) e Âmbar." },
+  { n:"Revelation", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","encontro"], cl:["quente"], nt:["citrico","amadeirado","aromatico","oriental"], im:["sofisticado","moderno"], ins:"Imagination", u:"revelation-thera-cosmeticos", desc:"Cítrico Aromático Amadeirado. Topo: Cidra, bergamota da Calábria e laranja siciliana. Coração: Néroli tunisiano, gengibre e canela do Ceilão. Base: Chá preto chinês, ambroxan, madeira guaiac e olíbano." },
+  { n:"Volcano Absolu", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","esporte"], cl:["quente"], nt:["amadeirado","aromatico","aquatico","floral","frutal"], im:["sofisticado","fresco"], ins:"Polo Blue", u:"volcano-absolu-thera-cosmeticos", desc:"Aromático Aquático Amadeirado. Topo: Melão, tangerina e pepino. Coração: Manjericão, sálvia e gerânio. Base: Camurça, patchouli e almíscar." },
+  { n:"Gigio", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["citrico","floral","amadeirado"], im:["sofisticado","moderno"], ins:"MYSLF", u:"gigio-thera-cosmeticos", desc:"Amadeirado Floral Cítrico. Topo: Bergamota da Calábria e Bergamota. Coração: Flor de Laranjeira da Tunísia. Base: Patchouli, Ambrofix™ e Musk." },
+  { n:"Volcano Black Reserve", b:"Thera Cosméticos", g:["masculino"], p:["qualquer"], oc:["trabalho","casual"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","gourmand","citrico"], im:["sofisticado","fresco","confortavel"], ins:"Polo Blue", u:"volcano-black-reserve-thera-cosmeticos", desc:"Aromático Fougère Amadeirado. Topo: Bergamota, Maçã e Folhas de Violeta. Coração: Lavanda, Flor de Laranjeira e Gerânio. Base: Fava Tonka, Âmbar, Patchouli, Musk e Baunilha." },
+  { n:"Glow", b:"Thera Cosméticos", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["floral","amadeirado","aromatico","citrico","frutal"], im:["sofisticado","moderno"], ins:"Idôle", u:"glow-thera-cosmeticos", desc:"Chipre Floral Almiscarado. Topo: Bergamota, Jasmim e Pera. Coração: Blend de Rosas. Base: Chipre Almiscarado." },
+  { n:"Joás Absolu", b:"Thera Cosméticos", g:["feminino"], p:["dia","qualquer"], oc:["casual","encontro"], cl:["moderado","frio"], nt:["floral","frutal","gourmand","oriental","amadeirado"], im:["sofisticado","moderno","fresco"], ins:"212 VIP Rosé | Delina", u:"joas-absolu-thera-cosmeticos", desc:"Frutado Floral Baunilhado. Topo: Rosa Damasco, Pimenta Rosa e Mandarina. Coração: Pera, Cassis e Sorvete. Base: Sal Marinho, Baunilha, Patchouli, Madeira Cashmere e Cedro." },
+  { n:"Samia", b:"Thera Cosméticos", g:["compartilhavel"], p:["dia","qualquer"], oc:["trabalho","casual","encontro"], cl:["quente"], nt:["citrico","aromatico","amadeirado","oriental"], im:["sofisticado","fresco","sedutor"], ins:"Clean Warm Cotton", u:"samia-thera-cosmeticos", desc:"Almiscarado Cítrico Aromático. Topo: Notas Cítricas. Coração: Notas Florais, Frutais e Oceânicas. Base: Âmbar, Almíscar e Samambaia." },
+  { n:"Isidore", b:"Thera Cosméticos", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["floral","amadeirado","gourmand","oriental","citrico"], im:["sofisticado","moderno"], ins:"212 Sexy for Women", u:"isidore-thera-cosmeticos", desc:"Floral Baunilhado Amadeirado. Topo: Pimenta rosa, Bergamota e Mandarina. Coração: Gardênia e pétalas florais. Base: Notas amadeiradas e Baunilha." },
+  { n:"Bluish Light", b:"In The Box", g:["feminino"], p:["dia","qualquer"], oc:["trabalho","casual","esporte"], cl:["quente"], nt:["citrico","floral","frutal"], im:["sofisticado","fresco","sedutor"], ins:"Light Blue Intense", u:"bluish-light-in-the-box", desc:"Cítrico Floral Frutado. Topo: Limão e Maçã Granny Smith. Coração: Jasmim e Cravo-de-defunto. Base: Musk e Madeira de Âmbar." },
+  { n:"Bad Girl", b:"In The Box", g:["feminino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["floral","gourmand","oriental","citrico"], im:["sofisticado","moderno","sedutor"], ins:"Good Girl", u:"bad-girl-in-the-box", desc:"Ambarado Floral Gourmand. Topo: Amêndoa, Café, Bergamota e Limão. Coração: Tuberosa, Jasmim Sambac, Flor de Laranjeira, Orris e Rosa da Bulgária. Base: Fava Tonka, Cacau, Baunilha, Pralinê, Sândalo, Musk, Âmbar, Cashmere, Canela, Patchouli e Cedro." },
+  { n:"Kate Parfum", b:"In The Box", g:["compartilhavel"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado","frio"], nt:["floral","frutal","amadeirado","oriental"], im:["sofisticado","sedutor"], ins:"English Pear & Freesia", u:"kate-parfum-in-the-box", desc:"Floral Frutado Amadeirado. Topo: Pera e Melão. Coração: Frésia e Rosa. Base: Musk, Patchouli, Ruibarbo e Âmbar." },
+  { n:"Salt Crystal", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","social"], cl:["quente","moderado"], nt:["amadeirado","aquatico"], im:["sofisticado","moderno","fresco"], ins:"Le Sel d'Issey", u:"salt-crystal-in-the-box", desc:"Aquático Marinho Amadeirado. Topo: Sal, Gengibre e Algas marinhas. Coração: Musgo de carvalho e Cedro. Base: Vetiver e Notas amadeiradas." },
+  { n:"The Desire Man Parfum", b:"In The Box", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado","frio"], nt:["amadeirado","gourmand","oriental"], im:["sofisticado","moderno","sedutor"], ins:"The Most Wanted Parfum", u:"the-desire-man-parfum-in-the-box", desc:"Amadeirado Baunilhado Especiado. Topo: Gengibre. Coração: Notas Amadeiradas. Base: Baunilha de Bourbon." },
+  { n:"The Real Commander", b:"In The Box", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["moderado"], nt:["amadeirado","oriental","gourmand","aromatico","floral"], im:["moderno","sedutor","confortavel"], ins:"Stronger With You Intensely", u:"the-real-commander-in-the-box", desc:"Ambarado Baunilhado Amadeirado. Topo: Pimenta-rosa, bagas de zimbro e violeta. Coração: Lavanda, sálvia, canela e toffee. Base: Âmbar, fava tonka, baunilha e sândalo." },
+  { n:"Tersus Parfum", b:"In The Box", g:["masculino"], p:["noite"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","citrico","floral","oriental"], im:["sofisticado","moderno"], ins:"Y EDP", u:"tersus-parfum-in-the-box", desc:"Fougère Aromático Amadeirado. Topo: Bergamota e Gengibre. Coração: Sálvia, Gerânio e Bagas de Zimbro. Base: Cedro, Vetiver e Olíbano." },
+  { n:"The Blue", b:"In The Box", g:["masculino"], p:["noite"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["amadeirado","aromatico","oriental","floral","citrico"], im:["sofisticado","moderno"], ins:"Bleu", u:"the-blue-in-the-box", desc:"Amadeirado Aromático Ambarado. Topo: Toranja, limão siciliano e hortelã. Coração: Gengibre, jasmim e notas aromáticas. Base: Cedro, sândalo e âmbar cinzento." },
+  { n:"Regnum Opus", b:"In The Box", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["floral","amadeirado","oriental","gourmand","citrico"], im:["sofisticado","moderno"], ins:"Layton Exclusif", u:"regnum-opus-in-the-box", desc:"Ambarado Floral Amadeirado. Topo: Amêndoa, mandarina, bergamota e notas aquosas. Coração: Civet, gerânio, rosa, gardênia e vitória-régia. Base: Madeira guaiac, oud de laos, baunilha, café, sândalo, patchouli, âmbar, musgo de carvalho e pimenta-rosa." },
+  { n:"Versus Pour Homme", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho"], cl:["quente"], nt:["citrico","aromatico","amadeirado","oriental","gourmand"], im:["sofisticado","fresco"], ins:"Versace Pour Homme", u:"versus-pour-homme-in-the-box", desc:"Aromático Cítrico Almiscarado. Topo: Bergamota, néroli, tangerina e folhas de laranjeira. Coração: Jacinto, sálvia esclareia, cedro e gerânio. Base: Fava tonka, almíscar e âmbar." },
+  { n:"Pinkish", b:"In The Box", g:["feminino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["floral","frutal","amadeirado"], im:["sofisticado","moderno","sedutor"], ins:"212 VIP Rosé", u:"pinkish-in-the-box", desc:"Floral Frutado Almiscarado. Topo: Champagne rosé e Pimenta rosa. Coração: Rosa e Flor de pêssego. Base: Musk e Notas amadeiradas." },
+  { n:"New Aventhis", b:"In The Box", g:["masculino"], p:["noite","qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["frutal","amadeirado","aromatico","oriental","gourmand"], im:["sofisticado","moderno","sedutor"], ins:"Aventus", u:"new-aventhis-in-the-box", desc:"Chipre Frutado Amadeirado. Topo: Bergamota, Groselha-preta, Abacaxi e Maçã. Coração: Vidoeiro, Patchouli, Rosa e Jasmim marroquino. Base: Musk, Musgo de carvalho, Baunilha e Ambergris." },
+  { n:"Mystic Newlands", b:"In The Box", g:["masculino"], p:["noite"], oc:["social","encontro"], cl:["frio"], nt:["oriental","citrico","aromatico","floral","amadeirado","oud"], im:["sofisticado","sedutor"], ins:"Outlands", u:"mystic-newlands-in-the-box", desc:"Ambarado Especiado Incensado. Topo: Cardamomo, Pimenta sichuan, Bergamota, Limão, Elemi e Olíbano. Coração: Patchouli, Gerânio, Flor de laranjeira, Açafrão, Coentro, Cominho, Anis e Absinto. Base: Resinas quentes, Âmbar, Oud, Baunilha, Ládano e Benjoim." },
+  { n:"Makathén", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["trabalho","social","encontro"], cl:["quente","moderado"], nt:["citrico","amadeirado","aromatico","frutal","floral"], im:["sofisticado","moderno"], ins:"Hacivat", u:"makathen-in-the-box", desc:"Chipre Cítrico Amadeirado. Topo: Abacaxi, Toranja e Bergamota. Coração: Cedro, Patchouli e Jasmim. Base: Musgo de carvalho." },
+  { n:"Lord Town", b:"In The Box", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["floral","amadeirado","oriental","gourmand","citrico"], im:["sofisticado","moderno"], ins:"Layton", u:"lord-town-in-the-box", desc:"Ambarado Floral Amadeirado. Topo: Maçã, Lavanda, Mandarina e Bergamota. Coração: Gerânio, Violeta e Jasmim. Base: Baunilha, Cardamomo, Sândalo, Patchouli, Pimenta e Madeira Guaiac." },
+  { n:"Lemon Vanilla & Wood", b:"In The Box", g:["masculino"], p:["qualquer"], oc:["trabalho","social","encontro"], cl:["moderado"], nt:["citrico","amadeirado","gourmand","oriental"], im:["sofisticado","sedutor"], ins:"Allure Homme Édition Blanche", u:"lemon-vanilla-wood-in-the-box", desc:"Cítrico Baunilhado Amadeirado. Topo: Limão e Bergamota. Coração: Sândalo e Notas Amadeiradas. Base: Baunilha (característica marcante do perfil)." },
+  { n:"Fire Snake", b:"In The Box", g:["compartilhavel"], p:["qualquer"], oc:["social","encontro"], cl:["quente"], nt:["frutal","amadeirado","oriental","floral","citrico"], im:["sofisticado","fresco"], ins:"God Of Fire | Erba Pura", u:"fire-snake-in-the-box", desc:"Ambarado Frutado Amadeirado. Topo: Gengibre, Limão, Manga e Bagas Vermelhas. Coração: Notas Amadeiradas, Jasmim e Cumarina. Base: Âmbar, Almíscar, Óleo de Cipriol, Oud e Nagarmota." },
+  { n:"Envoy", b:"In The Box", g:["masculino"], p:["noite","qualquer"], oc:["trabalho","casual","social","encontro"], cl:["moderado","frio"], nt:["frutal","amadeirado","oriental","gourmand","floral"], im:["sofisticado","moderno"], ins:"Ambassador Men (Gisada)", u:"envoy-in-the-box", desc:"Amadeirado Frutado Ambarado. Topo: Maçã, Tangerina, Cardamomo e Violeta. Coração: Manga, Lavanda Inglesa, Pimenta-preta, Patchouli e Peônia. Base: Musk, Baunilha, Âmbar, Vetiver, Acorde Amadeirado e Musgo de Carvalho." },
+  { n:"Me And I Absolu", b:"In The Box", g:["masculino"], p:["dia","qualquer"], oc:["casual"], cl:["moderado"], nt:["floral","amadeirado","oriental","citrico"], im:["sofisticado","moderno","sedutor"], ins:"MYSLF L'Absolu", u:"me-and-i-absolu-in-the-box", desc:"Amadeirado Especiado Floral. Topo: Bergamota, Gengibre e Cardamomo. Coração: Flor de laranjeira e acordes florais. Base: Patchouli." },
+  { n:"Pacific Pour Homme Aura", b:"Rayhaan", g:["masculino"], p:["dia","qualquer"], oc:["casual","esporte"], cl:["quente"], nt:["citrico","frutal","aromatico","oriental","floral"], im:["moderno","fresco","confortavel"], ins:"Pacific Chill", u:"pacific-pour-homme-aura-rayhaan", desc:"Cítrico Aromático Frutado. Topo: Mandarina, Menta, Cidra, Bergamota, Groselha Preta e Coentro. Coração: Manjericão, Semente de Cenoura e Rosa. Base: Figo, Ambroxan e Âmbar." },
+  { n:"Smoky", b:"Maison Alhambra", g:["masculino"], p:["noite"], oc:["encontro","social"], cl:["frio","quente"], nt:["oriental","citrico","frutal","gourmand"], im:["sedutor","sofisticado"], ins:"Tobacolor", u:"smoky-maison-alhambra-tobacolor-fdish", desc:"Oriental Especiado Tabacado. Topo: Ameixa, Pêssego, Bergamota, Cítricos. Coração: Mel, Fumaça, Notas Orientais. Base: Folha de Tabaco, Tabaco, Âmbar, Tabaco Branco." },
+  { n:"Vanille", b:"JA Essence", g:["compartilhavel"], p:["noite"], oc:["encontro","social"], cl:["frio","quente"], nt:["gourmand","oriental"], im:["confortavel","sedutor","sofisticado"], ins:"Vanille Planifolia", u:"vanille-ja-essence-vanille-planifolia-ujjb9", desc:"Baunilhado Ambarado Balsâmico. Notas: Baunilha, Especiarias, Âmbar, Opoponax, Almíscar." },
+  { n:"Alto", b:"JA Essence", g:["compartilhavel"], p:["noite"], oc:["encontro","social"], cl:["frio","quente"], nt:["oriental","floral","amadeirado","citrico","oud"], im:["confortavel","sedutor","sofisticado"], ins:"Rialto", u:"alto-ja-essence-rialto-cavm7", desc:"Oriental Floral Amadeirado. Topo: Açafrão, Manga, Bergamota. Coração: Rosa Taif, Íris-Negra. Base: Agarwood (Oud), Nagarmota ou Óleo de Cipriol, Almíscar Branco." },
+  { n:"Gris Extrait", b:"JA Essence", g:["compartilhavel"], p:["noite","qualquer"], oc:["encontro","social"], cl:["frio","quente"], nt:["amadeirado","oriental","floral","frutal","adocicado"], im:["confortavel","natural","sedutor","sofisticado"], ins:"Gris Charnel Extrait", u:"gris-extrait-ja-essence-gris-charnel-extrait-129ua", desc:"Amadeirado Especiado Atalcado. Topo: Cardamomo, Figo, Chá-Preto. Coração: Íris, Vetiver de Bourbon, Cistus Incanus. Base: Sândalo, Baunilha de Madagascar, Fava-Tonka, Cedro, Patchouli da Indonésia." },
+  { n:"First Love", b:"JA Essence", g:["feminino"], p:["noite"], oc:["encontro","social"], cl:["moderado"], nt:["floral","gourmand","oriental","citrico"], im:["confortavel","fresco","sedutor","sofisticado"], ins:"Love Don't Be Shy", u:"first-love-ja-essence-love-dont-be-shy-44fgw", desc:"Floral Gourmand Ambarado. Topo: Néroli, Bergamota. Coração: Flor de Laranjeira, Rosa, Jasmim. Base: Baunilha, Caramelo, Almíscar." },
+  { n:"Yacht", b:"JA Essence", g:["compartilhavel"], p:["noite","qualquer"], oc:["encontro","social"], cl:["quente"], nt:["frutal","oriental","gourmand"], im:["confortavel","sedutor","sofisticado"], ins:"Yacht Club de Monaco", u:"yacht-ja-essence-yacht-club-de-monaco-3m6kf", desc:"Frutado Especiado Alcoólico. Notas: Cereja, Rum, Canela, Frutas, Notas Aromáticas, Notas Doces." },
+  { n:"Narcotique Flower", b:"Maison Viégas", g:["feminino"], p:["dia","noite","qualquer"], oc:["casual","encontro","social","trabalho"], cl:["quente"], nt:["floral","frutal","amadeirado","citrico"], im:["fresco","moderno","sedutor","sofisticado"], ins:"Fleur Narcotique", u:"narcotique-flower-maison-viegas-fleur-narcotique-1yh4i", desc:"Floral Frutado Amadeirado. Topo: Lichia, Bergamota, Pêssego. Coração: Jasmim, Peônia, Flor de Laranjeira. Base: Almíscar, Musgo, Notas amadeiradas." },
+  { n:"Citrus Éclat", b:"Maison Viégas", g:["compartilhavel"], p:["dia","qualquer"], oc:["casual"], cl:["quente"], nt:["citrico","aromatico","aquatico","oriental"], im:["fresco","moderno","sofisticado"], ins:"Afternoon Swim", u:"citrus-eclat-maison-viegas-afternoon-swim-1j92b", desc:"Cítrico Aromático Mineral. Topo: Mandarina, Laranja Siciliana, Bergamota. Coração: Gengibre. Base: Âmbar Cinzento." },
+  { n:"Effie Rosé", b:"Thera Cosméticos", g:["feminino"], p:["dia","noite","qualquer"], oc:["casual","encontro","social"], cl:["moderado"], nt:["floral","frutal","amadeirado","citrico","gourmand"], im:["confortavel","fresco","natural","sedutor","sofisticado"], ins:"212 VIP Rosé", u:"effie-rose-thera-cosmeticos-212-vip-rose-coco-mademoiselle-ov0z7", desc:"Floral Frutado Amadeirado. Topo: Toranja, Folhas Verdes. Coração: Floral, Lírio do Vale, Rosa, Jasmim, Gardênia, Violeta. Base: Fruta, Baunilha, Caramelo, Madeira, Cedro, Patchouli, Almíscar, Âmbar." },
+  { n:"Cora", b:"Thera Cosméticos", g:["feminino"], p:["dia","qualquer"], oc:["encontro","trabalho"], cl:["frio","quente"], nt:["citrico","floral","amadeirado"], im:["confortavel","fresco","moderno","sedutor","sofisticado"], ins:"Criação autoral", u:"cora-thera-cosmeticos-autoral-thera-cosmeticos-12mo3", desc:"Cítrico Floral Amadeirado. Topo: Gengibre, Bergamota, Lima da Pérsia, Mandarina italiana. Coração: Néroli, Lírio Branco, Peônia, Jasmim. Base: Musk, Patchuli." },
+  { n:"Igar", b:"Thera Cosméticos", g:["masculino"], p:["dia","qualquer"], oc:["social","trabalho"], cl:["quente"], nt:["citrico","aromatico","amadeirado","oriental"], im:["confortavel","fresco","moderno","sedutor","sofisticado"], ins:"Tygar", u:"igar-thera-cosmeticos-tygar-1fynv", desc:"Cítrico Aromático Amadeirado. Topo: Toranja. Coração: Gengibre, Ambreta. Base: Ambroxan, Almiscar, Vetiver, Patchouli." },
+  { n:"Ginger Club", b:"Nuancielo", g:["masculino"], p:["dia","qualquer"], oc:["casual","social","trabalho"], cl:["quente"], nt:["citrico","aromatico","oriental","floral","adocicado"], im:["confortavel","fresco","moderno","sedutor","sofisticado"], ins:"Ingenious Ginger", u:"ginger-club-nuancielo-ingenious-ginger-46v6t", desc:"Cítrico Aromático Especiado. Topo: Flor de Gengibre, Limão, Bergamota. Coração: Mandarina, Magnólia, Jasmim, Rosa. Base: Baunilha, Âmbar, Sândalo, Almíscar, Cashmeran, Patchouli." },
+  { n:"Musa Sublime", b:"Nuancielo", g:["feminino"], p:["dia","noite","qualquer"], oc:["casual","encontro","social"], cl:["quente"], nt:["frutal","gourmand","floral","amadeirado"], im:["confortavel","fresco","sedutor"], ins:"Maui in a Bottle Sweet Banana", u:"musa-sublime-nuancielo-maui-in-a-bottle-sweet-banana-1cvym", desc:"Frutado Gourmand. Topo: Banana, Pera. Coração: Coco, Jasmim. Base: Baunilha, Sândalo." },
+  { n:"Intense Peach", b:"Nuancielo", g:["feminino"], p:["qualquer"], oc:["encontro","social"], cl:["quente"], nt:["floral","oriental","frutal","citrico","adocicado"], im:["confortavel","fresco","sedutor","sofisticado"], ins:"The One EDP", u:"intense-peach-nuancielo-the-one-edp-1aasz", desc:"Floral Ambarado Frutado. Topo: Pêssego, Lichia, Tangerina, Bergamota. Coração: Lírio, Ameixa, Jasmim, Lírio-do-Vale. Base: Baunilha, Âmbar, Almíscar, Vetiver." },
+];
+
+// ============================================================
+// QUIZ LOGIC
+// ============================================================
+function pick(btn) {
+  const step = btn.dataset.step;
+  document.querySelectorAll(`.opt:not(.multi)[data-step="${step}"]`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('n' + step).removeAttribute('disabled');
+  if (step == '0') STATE.gender = btn.dataset.val;
+  if (step == '3') STATE.clima = btn.dataset.val;
+  if (step == '6') STATE.impression = btn.dataset.val;
+  if (step == '6') {
+    const sh = document.getElementById('sweet-hint');
+    if (sh) sh.style.display = (btn.dataset.val === 'sedutor') ? 'block' : 'none';
+  }
+}
+
+function pickMulti(btn) {
+  btn.classList.toggle('selected');
+  const step = btn.dataset.step;
+  const any = document.querySelectorAll(`.opt.multi.selected[data-step="${step}"]`).length > 0;
+  document.getElementById('n' + step).disabled = !any;
+}
+
+function enableBtn(id) { document.getElementById(id).removeAttribute('disabled'); }
+
+function next(step) {
+  if (step === 1) STATE.period = [...document.querySelectorAll('.opt.multi.selected[data-step="1"]')].map(b => b.dataset.val);
+  if (step === 2) STATE.occasion = [...document.querySelectorAll('.opt.multi.selected[data-step="2"]')].map(b => b.dataset.val);
+  if (step === 4) STATE.notes = [...document.querySelectorAll('.opt.multi.selected[data-step="4"]')].map(b => b.dataset.val);
+  if (step === 5) STATE.avoid = [...document.querySelectorAll('.opt.multi.selected[data-step="5"]')].map(b => b.dataset.val);
+  goTo(step + 1);
+}
+
+function pickAvoid(btn) { btn.classList.toggle('selected'); }
+
+function skipStep(step) { goTo(step + 1); }
+function back(step) { goTo(step - 1); }
+
+function goTo(n) {
+  document.getElementById('s' + cur).classList.remove('active');
+  cur = n;
+  document.getElementById('s' + cur).classList.add('active');
+  const pct = Math.round((n / 8) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('step-label').textContent = `Passo ${n + 1} de 8`;
+  document.getElementById('step-pct').textContent = pct + '%';
+  if (n === 5) {
+    document.querySelectorAll('.opt[data-step="5"]').forEach(b => {
+      if (STATE.notes.includes(b.dataset.val)) { b.classList.remove('selected'); b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; }
+      else { b.style.opacity = ''; b.style.pointerEvents = ''; }
+    });
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function finalize() {
+  STATE.loves = document.getElementById('loves-input').value;
+  if (STATE.loves) {
+    showAILoading();
+    callAI();
+  } else {
+    showResults(null);
+  }
+}
+
+function showAILoading() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('ai-loading').style.display = 'block';
+}
+
+async function callAI() {
+  const msgs = ['Analisando perfil olfativo...', 'Comparando com o estoque...', 'Encontrando seus matches...'];
+  let mi = 0;
+  const iv = setInterval(() => {
+    const el = document.getElementById('loading-msg');
+    if (el && mi < msgs.length) el.textContent = msgs[mi++];
+  }, 900);
+  const aiData = analyzeLocal();
+  await new Promise(r => setTimeout(r, 1600));
+  clearInterval(iv);
+  showResults(aiData);
+}
+
+// ===== Análise local robusta (sem API) =====
+const NORM = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+
+// Dicionário curado de originais populares -> famílias olfativas
+const ORIG_NOTES = {
+  '9pm':['oriental','gourmand','amadeirado'], 'stronger with you intensely':['gourmand','oriental'],
+  'aventus':['frutal','amadeirado','citrico'], 'aventus cologne':['citrico','amadeirado','aromatico'],
+  'green irish tweed':['aromatico','amadeirado','floral'], 'silver mountain water':['citrico','amadeirado','aquatico'],
+  'viking':['aromatico','amadeirado','oriental'], 'royal oud':['amadeirado','oriental'],
+  'sauvage':['aromatico','amadeirado','citrico'], 'dior sauvage':['aromatico','amadeirado','citrico'],
+  'sauvage elixir':['oriental','amadeirado','aromatico'], 'eau sauvage':['citrico','aromatico'],
+  'bleu de chanel':['amadeirado','aromatico','citrico'], 'allure homme sport':['citrico','aromatico','amadeirado'],
+  'coco mademoiselle':['floral','oriental','citrico'], 'chance eau tendre':['floral','frutal'],
+  'chance eau fraiche':['citrico','floral'], 'chance eau splendide':['frutal','floral'],
+  'gabrielle':['floral'], 'no 5':['floral'], 'bleu':['amadeirado','aromatico','citrico'],
+  'le male':['aromatico','oriental','gourmand'], 'ultra male':['frutal','gourmand','oriental'],
+  'scandal':['gourmand','floral'], 'la belle':['gourmand','floral'],
+  'la nuit de l homme':['oriental','amadeirado','aromatico'], 'l homme ysl':['citrico','aromatico','amadeirado'],
+  'y ysl':['aromatico','amadeirado','aquatico'], 'myself':['amadeirado','floral','oriental'],
+  'libre':['floral','aromatico'], 'black opium':['gourmand','oriental'], 'mon paris':['frutal','floral'],
+  'baccarat rouge 540':['amadeirado','oriental','gourmand'], 'br540':['amadeirado','oriental','gourmand'],
+  'grand soir':['oriental','gourmand','amadeirado'], 'oud satin mood':['oriental','floral','gourmand'],
+  'delina':['floral','frutal'], 'delina exclusif':['floral','frutal','oriental'],
+  'layton':['aromatico','gourmand','amadeirado'], 'pegasus':['gourmand','amadeirado'],
+  'herod':['oriental','gourmand','amadeirado'], 'carlisle':['oriental','floral','gourmand'],
+  'althair':['gourmand','oriental'], 'kalan':['amadeirado','oriental','aromatico'],
+  'valaya':['floral','amadeirado','oriental'], 'sedley':['aromatico','aquatico','citrico'],
+  'good girl':['floral','gourmand','oriental'], 'very good girl':['frutal','floral'],
+  'la vie est belle':['gourmand','floral'], 'idole':['floral','amadeirado'],
+  'j adore':['floral','frutal'], 'miss dior':['floral'], 'poison girl':['gourmand','floral'],
+  'spicebomb':['oriental','gourmand','amadeirado'], 'spicebomb extreme':['gourmand','oriental'],
+  'the one':['oriental','gourmand','amadeirado'], 'light blue':['citrico','frutal','aquatico'],
+  'k by dolce gabbana':['citrico','aromatico','amadeirado'], 'devotion':['gourmand','floral'],
+  'acqua di gio':['aquatico','citrico','aromatico'], 'acqua di gio profumo':['aquatico','amadeirado','oriental'],
+  'stronger with you':['gourmand','oriental','amadeirado'], 'si':['floral','frutal','oriental'],
+  'my way':['floral','amadeirado'], 'terre d hermes':['citrico','amadeirado','aromatico'],
+  'one million':['oriental','gourmand','amadeirado'], '1 million':['oriental','gourmand','amadeirado'],
+  'invictus':['aquatico','amadeirado','citrico'], 'phantom':['citrico','gourmand','aromatico'],
+  'olympea':['gourmand','oriental'], 'lady million':['floral','frutal','gourmand'],
+  'explorer':['amadeirado','aromatico','oriental'], 'legend':['aromatico','citrico','amadeirado'],
+  'boss bottled':['amadeirado','oriental','frutal'], 'nautica voyage':['aquatico','citrico','amadeirado'],
+  'eros':['aromatico','oriental','gourmand'], 'eros flame':['citrico','oriental','amadeirado'],
+  'dylan blue':['aquatico','aromatico','amadeirado'], 'bright crystal':['floral','frutal'],
+  'gentleman':['oriental','gourmand','amadeirado'], 'oud wood':['amadeirado','oriental'],
+  'tobacco vanille':['gourmand','oriental'], 'lost cherry':['frutal','gourmand','oriental'],
+  'tom ford noir':['oriental','amadeirado'], 'bitter peach':['frutal','gourmand'],
+  'fucking fabulous':['amadeirado','oriental','aromatico'], 'soleil blanc':['oriental','floral','gourmand'],
+  'neroli portofino':['citrico','aromatico'], 'santal 33':['amadeirado','oriental'],
+  'another 13':['amadeirado','oriental','aquatico'], 'afternoon swim':['citrico','aquatico'],
+  'erba pura':['frutal','gourmand','oriental'], 'erba gold':['frutal','citrico','oriental'],
+  'naxos':['gourmand','oriental','aromatico'], 'alexandria ii':['oriental','gourmand'],
+  'symphony':['floral','amadeirado'], 'vibrato':['oriental','floral','amadeirado'],
+  'angels share':['gourmand','oriental'], 'love don t be shy':['gourmand','floral'],
+  'black phantom':['gourmand'], 'born in roma':['aromatico','amadeirado','oriental'],
+  'born in roma donna':['floral','gourmand'], 'uomo':['amadeirado','gourmand'],
+  'khamrah':['gourmand','oriental'], 'asad':['aromatico','gourmand','amadeirado'],
+  'yara':['frutal','floral','gourmand'], 'club de nuit intense':['frutal','amadeirado','citrico'],
+  'oud for greatness':['oriental','amadeirado','aromatico'], 'nectar':['frutal','gourmand','floral'],
+  'pacific chill':['citrico','frutal','aquatico'], 'imagination':['citrico','gourmand','amadeirado'],
+  'ombre nomade':['oriental','amadeirado'], 'stronger with you intensely':['gourmand','oriental']
+};
+
+function buildInsMaps(){
+  const notes={}, prods={};
+  CAT.forEach(p=>{ if(p.ins){ const k=NORM(p.ins);
+    (notes[k]=notes[k]||[]).push(...p.nt); (prods[k]=prods[k]||[]).push(p.n); } });
+  return {notes,prods};
+}
+const INS = buildInsMaps();
+
+function matchOriginal(input){
+  const q = NORM(input);
+  if(!q || q.length < 3) return null;
+  // 1) dicionário curado: prioriza match exato, depois input-contém-chave, depois chave-contém-input
+  let curated=null, cScore=-1;
+  Object.keys(ORIG_NOTES).forEach(k=>{
+    if(k.length<4) return;
+    let sc=-1;
+    if(q===k) sc=1000;
+    else if(q.includes(k)) sc=500+k.length;
+    else if(k.includes(q)) sc=100-(k.length-q.length);
+    if(sc>cScore){ cScore=sc; curated=ORIG_NOTES[k]; }
+  });
+  // 2) contratipos no catálogo (nome do produto OU inspiração) + frequência de notas
+  const freq={}; const prods=[]; let label=null;
+  CAT.forEach(p=>{
+    const n=NORM(p.n), ins=p.ins?NORM(p.ins):'';
+    const nameHit = n.length>=4 && (q.includes(n)||n.includes(q));
+    const insWords = ins ? ins.split(' ').filter(w=>w.length>=4) : [];
+    const insHit = ins && (q.includes(ins) || insWords.some(w=>q.includes(w)));
+    if(nameHit || insHit){ prods.push(p.n); if(!label) label=(p.ins||p.n); p.nt.forEach(x=>freq[x]=(freq[x]||0)+1); }
+  });
+  let notes;
+  if(curated){ notes=curated.slice(0,3); }
+  else { notes=Object.keys(freq).sort((a,b)=>freq[b]-freq[a]).slice(0,3); }
+  if(!curated && prods.length===0) return null;
+  return { label: label||q, notes, prods:[...new Set(prods)].slice(0,6) };
+}
+
+function analyzeLocal(){
+  const love = matchOriginal(STATE.loves);
+  const hate = matchOriginal(STATE.hates);
+  const boostNotes = love ? love.notes.slice() : [];
+  const avoidNotes = hate ? hate.notes.filter(n => !boostNotes.includes(n)) : [];
+  const insMatches = love ? love.prods.slice() : [];
+  const lv = (STATE.loves||'').trim();
+  let lovesAnalysis=null, aiInsight=null;
+  if(love){
+    lovesAnalysis = `Perfil olfativo ${boostNotes.slice(0,3).join(', ')} identificado a partir de "${lv}".`;
+    aiInsight = `Seu gosto por "${lv}" revela um DNA ${boostNotes.slice(0,2).join(' e ')} — priorizamos isso nos seus matches.`;
+  } else if(lv){
+    aiInsight = `Focamos nas notas que você escolheu para montar suas recomendações.`;
+  }
+  return { lovesAnalysis, boostNotes, avoidNotes, aiInsight, insMatches, localOnly:true };
+}
+
+function scoreP(p, aiData) {
+  let score = 0;
+  if (STATE.avoid && STATE.avoid.length && STATE.avoid.some(a => p.nt.includes(a))) return -99;
+  // Gender filter
+  if (STATE.gender) {
+    if (p.g.includes(STATE.gender) || p.g.includes('compartilhavel')) score += 3;
+    else return -99;
+  }
+  // Period
+  if (STATE.period.length > 0) {
+    const hit = STATE.period.some(pe => p.p.includes(pe) || p.p.includes('qualquer') || pe === 'qualquer');
+    if (hit) score += 2;
+  }
+  // Occasion
+  if (STATE.occasion.length > 0) {
+    score += STATE.occasion.filter(o => p.oc.includes(o)).length * 1.5;
+  }
+  // Climate
+  if (STATE.clima && p.cl.includes(STATE.clima)) score += 2;
+  // Notas — REQUISITO (nos 6 principais) / pontuação leve (nos 4 extras)
+  if (STATE.notes.length > 0) {
+    const matches = STATE.notes.filter(n => p.nt.includes(n)).length;
+    if (NOTE_MODE === 'all') {
+      if (matches < STATE.notes.length) return -99; // precisa ter TODAS as escolhidas
+    } else if (NOTE_MODE === 'any') {
+      if (matches === 0) return -99;                // precisa ter ao menos UMA
+    }
+    // NOTE_MODE === 'soft' -> sem exclusão: notas apenas somam pontos
+    score += matches * 3.5;
+  }
+  // Impression
+  if (STATE.impression && p.im.includes(STATE.impression)) score += 3;
+  // AI boosts/avoids
+  if (aiData) {
+    if (aiData.boostNotes) score += aiData.boostNotes.filter(n => p.nt.includes(n)).length * 2;
+    if (aiData.avoidNotes) score -= aiData.avoidNotes.filter(n => p.nt.includes(n)).length * 3;
+    // Bônus direto para perfumes que são contratipos do que o usuário ama
+    if (aiData.insMatches && aiData.insMatches.includes(p.n)) score += 8;
+  }
+  return score;
+}
+
+function showResults(aiData) {
+  document.getElementById('ai-loading').style.display = 'none';
+  function rank(limit) {
+    return CAT.map(p => ({ ...p, score: scoreP(p, aiData) }))
+      .filter(p => p.score > 2)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+  // 1) Principais (até 6): a(s) família(s) escolhida(s) são OBRIGATÓRIAS
+  NOTE_MODE = 'all';
+  let principais = rank(6);
+  if (principais.length < 3 && STATE.notes.length > 1) { NOTE_MODE = 'any'; principais = rank(6); }
+  // 2) Extras (até 4): perfumes que NÃO seguem a regra das famílias (pode faltar a escolhida), pontuação leve
+  NOTE_MODE = 'soft';
+  const usados = new Set(principais.map(p => p.n));
+  const cumpreRegra = p => STATE.notes.length === 0 || STATE.notes.every(n => p.nt.includes(n));
+  const extras = CAT.map(p => ({ ...p, score: scoreP(p, aiData) }))
+    .filter(p => p.score > 2 && !usados.has(p.n) && (STATE.notes.length === 0 || !cumpreRegra(p)))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+  const scored = principais.concat(extras);
+  const principaisLen = principais.length;
+
+  document.getElementById('results').style.display = 'block';
+
+  const gLabel = STATE.gender === 'masculino' ? 'masculinos' : STATE.gender === 'feminino' ? 'femininos' : 'compartilháveis';
+  document.getElementById('res-sub').textContent = aiData?.lovesAnalysis
+    ? `Com base no seu perfil ${STATE.impression ? STATE.impression : ''} e na análise do seu gosto por "${STATE.loves}".`
+    : `Perfumes ${STATE.impression ? STATE.impression + 's' : gLabel} que combinam com seu perfil.`;
+
+  const list = document.getElementById('results-list');
+
+  if (scored.length === 0) {
+    list.innerHTML = `<div class="no-results">Não encontramos matches exatos. Tente ampliar suas preferências — temos mais de 190 perfumes no estoque!</div>`;
+  } else {
+    list.innerHTML = scored.map((p, i) => {
+      const isTop = i === 0;
+      const rk = String(i + 1).padStart(2, '0');
+      const tags = [...new Set([...p.nt.slice(0,3), p.im[0]])].filter(Boolean);
+      const insText = p.ins ? ` · Inspirado em ${p.ins}` : '';
+      const aiInsightHtml = (i === 0 && aiData?.aiInsight) ? `<div class="ai-insight">✦ ${aiData.aiInsight}</div>` : '';
+      const divider = (i === principaisLen && extras.length > 0)
+        ? `<div style="margin:1.5rem 0 0.75rem;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);border-top:0.5px solid var(--border);padding-top:1rem;">Você também pode gostar</div>`
+        : '';
+      const link = p.u ? `https://www.nerodecants.com.br/produtos/${p.u}/` : '';
+      const card = `<div class="perfume-card${isTop ? ' top' : ''}">
+        <div class="rank">${rk}</div>
+        <div class="perfume-body">
+          ${isTop ? '<div class="best-badge">Melhor match</div>' : ''}
+          <div class="p-name">${p.n}</div>
+          <div class="p-brand">${p.b}${insText}</div>
+          <div class="p-tags">${tags.map(t => `<span class="p-tag">${t}</span>`).join('')}</div>
+          <div class="p-reason">${p.desc}</div>
+          ${aiInsightHtml}
+          ${link ? '<div class="p-cta">Ver na loja →</div>' : ''}
+        </div>
+      </div>`;
+      return divider + (link ? `<a class="perfume-link" href="${link}" target="_blank" rel="noopener">${card}</a>` : card);
+    }).join('');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  Object.assign(STATE, { gender:null, period:[], occasion:[], clima:null, notes:[], avoid:[], impression:null, loves:'', hates:'' });
+  const shR = document.getElementById('sweet-hint'); if (shR) shR.style.display = 'none';
+  document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('[id^="n"]').forEach(b => b.disabled = true);
+  document.getElementById('loves-input').value = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  cur = 0;
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('s0').classList.add('active');
+  document.getElementById('progress').style.width = '0%';
+  document.getElementById('step-label').textContent = 'Passo 1 de 8';
+  document.getElementById('step-pct').textContent = '0%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
