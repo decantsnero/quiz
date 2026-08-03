@@ -148,6 +148,14 @@
     display: block;
     line-height: 1.3;
   }
+  .pref-block { margin-bottom: 22px; }
+  .pref-q { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .res-group { margin: 1.75rem 0 0.75rem; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); border-top: 0.5px solid var(--border); padding-top: 1rem; }
+  .res-group.first { margin-top: 0.5rem; border-top: none; padding-top: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 1.25rem; }
+  .chip { font-family: inherit; font-size: 12px; padding: 7px 14px; border-radius: 999px; border: 0.5px solid var(--border); background: var(--white); color: var(--dark); cursor: pointer; }
+  .chip.on { border-color: var(--gold); background: #FBF6E9; color: var(--accent); }
+  .p-why { font-size: 12px; color: var(--accent); margin-top: 8px; line-height: 1.45; }
   .opt-desc {
     font-size: 12px;
     color: var(--muted);
@@ -402,7 +410,7 @@
   <div id="quiz">
     <div class="progress-wrap">
       <div class="progress-meta">
-        <span id="step-label">Passo 1 de 8</span>
+        <span id="step-label">Passo 1 de 9</span>
         <span id="step-pct">0%</span>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
@@ -503,6 +511,7 @@
     <!-- Step 4: Notas -->
     <div class="step" id="s4">
       <div class="step-title">Que tipo de cheiro te atrai?</div>
+      <div class="step-hint" id="conflict-hint" style="display:none"></div>
       <div class="multi-note">✦ Pode escolher mais de uma</div>
       <div class="opts cols-2">
         <button class="opt multi" data-step="4" data-val="citrico" onclick="pickMulti(this)"><div class="opt-icon">🍋</div><div><span class="opt-label">Cítrico</span><span class="opt-desc">Fresco e efervescente, dá leveza e sensação de limpeza. Ex.: limão, bergamota, laranja.</span></div></button>
@@ -554,19 +563,42 @@
       <div class="nav"><button class="btn-back" onclick="back(6)">← Voltar</button><button class="btn-next" id="n6" disabled onclick="next(6)">Continuar →</button></div>
     </div>
 
-    <!-- Step 7: Ama -->
+    <!-- Step 7: Intensidade e doçura -->
     <div class="step" id="s7">
+      <div class="step-title">Como você gosta que o perfume se comporte?</div>
+      <div class="step-hint">Isso ajuda a evitar o erro mais comum: acertar o cheiro mas errar a força.</div>
+      <div class="pref-block">
+        <div class="pref-q">Presença</div>
+        <div class="opts cols-3">
+          <button class="opt" data-step="7i" data-val="forte" onclick="pickPref(this,'intensity')"><div><span class="opt-label">Marcante</span><span class="opt-desc">Percebem de longe, deixa rastro</span></div></button>
+          <button class="opt" data-step="7i" data-val="moderada" onclick="pickPref(this,'intensity')"><div><span class="opt-label">Equilibrada</span><span class="opt-desc">Presente, sem exagero</span></div></button>
+          <button class="opt" data-step="7i" data-val="leve" onclick="pickPref(this,'intensity')"><div><span class="opt-label">Discreta</span><span class="opt-desc">Mais perto da pele, intimista</span></div></button>
+        </div>
+      </div>
+      <div class="pref-block">
+        <div class="pref-q">Doçura</div>
+        <div class="opts cols-3">
+          <button class="opt" data-step="7s" data-val="nada" onclick="pickPref(this,'sweet')"><div><span class="opt-label">Nada doce</span><span class="opt-desc">Foge de baunilha e caramelo</span></div></button>
+          <button class="opt" data-step="7s" data-val="sutil" onclick="pickPref(this,'sweet')"><div><span class="opt-label">Toque sutil</span><span class="opt-desc">Um fundo levemente doce</span></div></button>
+          <button class="opt" data-step="7s" data-val="doce" onclick="pickPref(this,'sweet')"><div><span class="opt-label">Bem doce</span><span class="opt-desc">Gosto de sobremesa</span></div></button>
+        </div>
+      </div>
+      <div class="nav"><button class="btn-back" onclick="back(7)">← Voltar</button><div style="display:flex;align-items:center;gap:16px"><button class="btn-skip" onclick="skipStep(7)">Pular</button><button class="btn-next" id="n7" onclick="next(7)">Continuar →</button></div></div>
+    </div>
+
+    <!-- Step 8: Ama -->
+    <div class="step" id="s8">
       <div class="step-title">Tem um perfume que você ama?</div>
       <div class="step-hint">Nossa IA vai analisar as notas e acordes desse perfume para buscar similaridades no estoque. Pode pular se não souber.</div>
       <div class="field-wrap">
-        <input type="text" id="loves-input" placeholder="Ex: Sauvage Dior, Chanel N°5, Good Girl, Acqua di Gio..." oninput="enableBtn('n7')">
+        <input type="text" id="loves-input" placeholder="Ex: Sauvage Dior, Chanel N°5, Good Girl, Acqua di Gio..." oninput="enableBtn('n8')">
       </div>
       <div class="ai-badge"><div class="ai-dot"></div> Interpretado por IA</div>
       <div class="nav">
-        <button class="btn-back" onclick="back(7)">← Voltar</button>
+        <button class="btn-back" onclick="back(8)">← Voltar</button>
         <div style="display:flex;align-items:center;gap:16px">
           <button class="btn-skip" onclick="finalize()">Pular e ver resultados</button>
-          <button class="btn-next" id="n7" onclick="finalize()">Ver meus perfumes →</button>
+          <button class="btn-next" id="n8" onclick="finalize()">Ver meus perfumes →</button>
         </div>
       </div>
     </div>
@@ -586,13 +618,14 @@
       <div class="results-title" id="res-title">Encontramos os seus perfumes</div>
       <div class="results-sub" id="res-sub"></div>
     </div>
+    <div class="chips" id="res-chips"></div>
     <div id="results-list"></div>
     <button class="btn-restart" onclick="restart()">↺ Fazer o quiz novamente</button>
   </div>
 </div>
 
 <script>
-const STATE = { gender:null, period:[], occasion:[], clima:null, notes:[], avoid:[], impression:null, loves:'', hates:'' };
+const STATE = { gender:null, period:[], occasion:[], clima:null, notes:[], avoid:[], impression:null, intensity:null, sweet:null, loves:'', hates:'' };
 let cur = 0;
 let NOTE_MODE = 'all'; // 'all' = exige todas as famílias escolhidas; 'any' = pelo menos uma (fallback)
 
@@ -850,7 +883,32 @@ function next(step) {
   goTo(step + 1);
 }
 
+let RESULT_FILTER = null;
+
 function pickAvoid(btn) { btn.classList.toggle('selected'); }
+
+function pickPref(btn, key) {
+  const grp = btn.dataset.step;
+  document.querySelectorAll('.opt[data-step="' + grp + '"]').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  STATE[key] = btn.dataset.val;
+}
+
+// Nível de doçura do perfume: 2 = gourmand, 1 = levemente adocicado, 0 = seco
+function sweetLevel(p) {
+  if (p.nt.includes('gourmand')) return 2;
+  if (p.nt.includes('adocicado')) return 1;
+  return 0;
+}
+
+// Presença estimada a partir das famílias
+function intensityLevel(p) {
+  const pesado = ['oud','oriental','gourmand'].some(x => p.nt.includes(x));
+  const leve = ['citrico','aquatico','aromatico'].some(x => p.nt.includes(x));
+  if (pesado) return 'forte';
+  if (leve && !p.nt.includes('amadeirado') && !p.nt.includes('adocicado')) return 'leve';
+  return 'moderada';
+}
 
 function skipStep(step) { goTo(step + 1); }
 function back(step) { goTo(step - 1); }
@@ -859,10 +917,20 @@ function goTo(n) {
   document.getElementById('s' + cur).classList.remove('active');
   cur = n;
   document.getElementById('s' + cur).classList.add('active');
-  const pct = Math.round((n / 8) * 100);
+  const pct = Math.round((n / 9) * 100);
   document.getElementById('progress').style.width = pct + '%';
-  document.getElementById('step-label').textContent = `Passo ${n + 1} de 8`;
+  document.getElementById('step-label').textContent = `Passo ${n + 1} de 9`;
   document.getElementById('step-pct').textContent = pct + '%';
+  if (n === 4) {
+    const ch = document.getElementById('conflict-hint');
+    if (ch) {
+      const diaNoite = STATE.period.includes('dia') && STATE.period.includes('noite');
+      if (diaNoite) {
+        ch.innerHTML = '💡 Você marcou <strong>dia e noite</strong>: são momentos que pedem coisas diferentes. Pode escolher famílias dos dois mundos — no final separamos as sugestões por <strong>dia</strong>, <strong>noite</strong> e <strong>versáteis</strong>.';
+        ch.style.display = 'block';
+      } else { ch.style.display = 'none'; }
+    }
+  }
   if (n === 5) {
     document.querySelectorAll('.opt[data-step="5"]').forEach(b => {
       if (STATE.notes.includes(b.dataset.val)) { b.classList.remove('selected'); b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; }
@@ -1000,8 +1068,30 @@ function matchOriginal(input){
   return { label: label||q, notes, prods:[...new Set(prods)].slice(0,6) };
 }
 
+// Divide "Sauvage, Layton e Delina" em partes e casa cada uma
+function matchLovesMulti(txt){
+  const partes = (txt||'').split(/[,;/]| e /i).map(x => x.trim()).filter(x => x.length > 2);
+  const alvos = partes.length ? partes : [(txt||'').trim()];
+  const notes = [], prods = [], labels = [];
+  alvos.forEach(q => {
+    if (!q) return;
+    const m = matchOriginal(q);
+    if (m) { m.notes.forEach(n => notes.push(n)); m.prods.forEach(p => prods.push(p)); labels.push(m.label); return; }
+    // fallback: procurar no próprio catálogo (nome do decant ou inspiração)
+    const nq = NORM(q);
+    const hit = CAT.find(p => NORM(p.n) === nq || NORM(p.ins || '') === nq)
+             || CAT.find(p => NORM(p.n).includes(nq) || NORM(p.ins || '').includes(nq));
+    if (hit) { hit.nt.forEach(n => notes.push(n)); prods.push(hit.n); labels.push(hit.ins || hit.n); }
+  });
+  if (!notes.length && !prods.length) return null;
+  const freq = {};
+  notes.forEach(n => freq[n] = (freq[n] || 0) + 1);
+  const top = Object.keys(freq).sort((a,b) => freq[b] - freq[a]).slice(0, 4);
+  return { label: labels.join(', '), notes: top, prods: [...new Set(prods)].slice(0, 8) };
+}
+
 function analyzeLocal(){
-  const love = matchOriginal(STATE.loves);
+  const love = matchLovesMulti(STATE.loves);
   const hate = matchOriginal(STATE.hates);
   const boostNotes = love ? love.notes.slice() : [];
   const avoidNotes = hate ? hate.notes.filter(n => !boostNotes.includes(n)) : [];
@@ -1049,6 +1139,19 @@ function scoreP(p, aiData) {
   }
   // Impression
   if (STATE.impression && p.im.includes(STATE.impression)) score += 3;
+  // Doçura desejada
+  if (STATE.sweet) {
+    const sl = sweetLevel(p);
+    if (STATE.sweet === 'nada') { if (sl === 2) return -99; if (sl === 1) score -= 2; else score += 2; }
+    else if (STATE.sweet === 'sutil') { if (sl === 1) score += 3; else if (sl === 2) score -= 2; }
+    else if (STATE.sweet === 'doce') { if (sl === 2) score += 3; else if (sl === 1) score += 1.5; else score -= 2; }
+  }
+  // Presença desejada
+  if (STATE.intensity) {
+    const il = intensityLevel(p);
+    if (il === STATE.intensity) score += 3;
+    else if ((il === 'forte' && STATE.intensity === 'leve') || (il === 'leve' && STATE.intensity === 'forte')) score -= 3;
+  }
   // AI boosts/avoids
   if (aiData) {
     if (aiData.boostNotes) score += aiData.boostNotes.filter(n => p.nt.includes(n)).length * 2;
@@ -1067,11 +1170,9 @@ function showResults(aiData) {
       .sort((a, b) => b.score - a.score)
       .slice(0, limit);
   }
-  // 1) Principais (até 6): a(s) família(s) escolhida(s) são OBRIGATÓRIAS
   NOTE_MODE = 'all';
   let principais = rank(6);
   if (principais.length < 3 && STATE.notes.length > 1) { NOTE_MODE = 'any'; principais = rank(6); }
-  // 2) Extras (até 4): perfumes que NÃO seguem a regra das famílias (pode faltar a escolhida), pontuação leve
   NOTE_MODE = 'soft';
   const usados = new Set(principais.map(p => p.n));
   const cumpreRegra = p => STATE.notes.length === 0 || STATE.notes.every(n => p.nt.includes(n));
@@ -1079,9 +1180,8 @@ function showResults(aiData) {
     .filter(p => p.score > 2 && !usados.has(p.n) && (STATE.notes.length === 0 || !cumpreRegra(p)))
     .sort((a, b) => b.score - a.score)
     .slice(0, 4);
-  const scored = principais.concat(extras);
-  const principaisLen = principais.length;
 
+  window.__RES = { principais, extras, aiData };
   document.getElementById('results').style.display = 'block';
 
   const gLabel = STATE.gender === 'masculino' ? 'masculinos' : STATE.gender === 'feminino' ? 'femininos' : 'compartilháveis';
@@ -1089,41 +1189,135 @@ function showResults(aiData) {
     ? `Com base no seu perfil ${STATE.impression ? STATE.impression : ''} e na análise do seu gosto por "${STATE.loves}".`
     : `Perfumes ${STATE.impression ? STATE.impression + 's' : gLabel} que combinam com seu perfil.`;
 
-  const list = document.getElementById('results-list');
-
-  if (scored.length === 0) {
-    list.innerHTML = `<div class="no-results">Não encontramos matches exatos. Tente ampliar suas preferências — temos mais de 190 perfumes no estoque!</div>`;
-  } else {
-    list.innerHTML = scored.map((p, i) => {
-      const isTop = i === 0;
-      const rk = String(i + 1).padStart(2, '0');
-      const tags = [...new Set([...p.nt.slice(0,3), p.im[0]])].filter(Boolean);
-      const insText = p.ins ? ` · Inspirado em ${p.ins}` : '';
-      const aiInsightHtml = (i === 0 && aiData?.aiInsight) ? `<div class="ai-insight">✦ ${aiData.aiInsight}</div>` : '';
-      const divider = (i === principaisLen && extras.length > 0)
-        ? `<div style="margin:1.5rem 0 0.75rem;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);border-top:0.5px solid var(--border);padding-top:1rem;">Você também pode gostar</div>`
-        : '';
-      const link = p.u ? `https://www.nerodecants.com.br/produtos/${p.u}/` : '';
-      const card = `<div class="perfume-card${isTop ? ' top' : ''}">
-        <div class="rank">${rk}</div>
-        <div class="perfume-body">
-          ${isTop ? '<div class="best-badge">Melhor match</div>' : ''}
-          <div class="p-name">${p.n}</div>
-          <div class="p-brand">${p.b}${insText}</div>
-          <div class="p-tags">${tags.map(t => `<span class="p-tag">${t}</span>`).join('')}</div>
-          <div class="p-reason">${p.desc}</div>
-          ${aiInsightHtml}
-          ${link ? '<div class="p-cta">Ver na loja →</div>' : ''}
-        </div>
-      </div>`;
-      return divider + (link ? `<a class="perfume-link" href="${link}" target="_blank" rel="noopener">${card}</a>` : card);
-    }).join('');
-  }
+  renderResults();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Por que este perfume foi sugerido
+function whyText(p, aiData) {
+  const partes = [];
+  if (STATE.notes.length) {
+    const m = STATE.notes.filter(n => p.nt.includes(n));
+    if (m.length) partes.push(m.join(' + '));
+  }
+  if (STATE.occasion.length) {
+    const o = STATE.occasion.filter(x => p.oc.includes(x));
+    if (o.length) partes.push(o[0] === 'encontro' ? 'encontro' : o[0]);
+  }
+  if (STATE.clima && p.cl.includes(STATE.clima)) partes.push('clima ' + STATE.clima);
+  if (STATE.intensity && intensityLevel(p) === STATE.intensity) {
+    partes.push(STATE.intensity === 'forte' ? 'presença marcante' : STATE.intensity === 'leve' ? 'presença discreta' : 'presença equilibrada');
+  }
+  if (STATE.sweet) {
+    const sl = sweetLevel(p);
+    if (STATE.sweet === 'nada' && sl === 0) partes.push('sem doçura');
+    if (STATE.sweet === 'sutil' && sl === 1) partes.push('doçura sutil');
+    if (STATE.sweet === 'doce' && sl === 2) partes.push('bem doce');
+  }
+  if (STATE.impression && p.im.includes(STATE.impression)) partes.push(STATE.impression);
+  let txt = partes.length ? 'Combina com: ' + partes.join(' · ') : '';
+  if (aiData && aiData.insMatches && aiData.insMatches.includes(p.n)) {
+    txt = 'DNA parecido com o que você ama' + (txt ? ' · ' + txt.replace('Combina com: ', '') : '');
+  }
+  return txt;
+}
+
+function grupoDe(p) {
+  const dia = p.p.includes('dia'), noite = p.p.includes('noite'), qq = p.p.includes('qualquer');
+  if (qq || (dia && noite)) return 'versatil';
+  if (dia) return 'dia';
+  if (noite) return 'noite';
+  return 'versatil';
+}
+
+function passaFiltro(p) {
+  if (!RESULT_FILTER) return true;
+  if (RESULT_FILTER === 'nodoce') return sweetLevel(p) === 0;
+  if (RESULT_FILTER === 'fresco') return ['citrico','aquatico','aromatico'].some(x => p.nt.includes(x));
+  if (RESULT_FILTER === 'intenso') return intensityLevel(p) === 'forte';
+  return true;
+}
+
+function setFiltro(v) {
+  RESULT_FILTER = (RESULT_FILTER === v) ? null : v;
+  renderResults();
+}
+
+function cardHtml(p, idx, aiData, isTop) {
+  const rk = String(idx).padStart(2, '0');
+  const tags = [...new Set([...p.nt.slice(0,3), p.im[0]])].filter(Boolean);
+  const insText = p.ins ? ` · Inspirado em ${p.ins}` : '';
+  const aiInsightHtml = (isTop && aiData?.aiInsight) ? `<div class="ai-insight">✦ ${aiData.aiInsight}</div>` : '';
+  const why = whyText(p, aiData);
+  const link = p.u ? `https://www.nerodecants.com.br/produtos/${p.u}/` : '';
+  const card = `<div class="perfume-card${isTop ? ' top' : ''}">
+    <div class="rank">${rk}</div>
+    <div class="perfume-body">
+      ${isTop ? '<div class="best-badge">Melhor match</div>' : ''}
+      <div class="p-name">${p.n}</div>
+      <div class="p-brand">${p.b}${insText}</div>
+      <div class="p-tags">${tags.map(t => `<span class="p-tag">${t}</span>`).join('')}</div>
+      <div class="p-reason">${p.desc}</div>
+      ${why ? `<div class="p-why">✦ ${why}</div>` : ''}
+      ${aiInsightHtml}
+      ${link ? '<div class="p-cta">Ver na loja →</div>' : ''}
+    </div>
+  </div>`;
+  return link ? `<a class="perfume-link" href="${link}" target="_blank" rel="noopener">${card}</a>` : card;
+}
+
+function renderResults() {
+  const { principais, extras, aiData } = window.__RES || { principais: [], extras: [], aiData: null };
+  const list = document.getElementById('results-list');
+  const chips = document.getElementById('res-chips');
+
+  if (chips) {
+    const defs = [ ['nodoce','Sem doces'], ['fresco','Só os frescos'], ['intenso','Mais intensos'] ];
+    chips.innerHTML = (principais.length + extras.length) > 2
+      ? defs.map(d => `<button class="chip${RESULT_FILTER === d[0] ? ' on' : ''}" onclick="setFiltro('${d[0]}')">${d[1]}</button>`).join('')
+      : '';
+  }
+
+  const pr = principais.filter(passaFiltro);
+  const ex = extras.filter(passaFiltro);
+
+  if (pr.length + ex.length === 0) {
+    list.innerHTML = `<div class="no-results">${RESULT_FILTER ? 'Nenhuma sugestão com esse filtro. Toque de novo no filtro para remover.' : 'Não encontramos matches exatos. Tente ampliar suas preferências — temos mais de 200 perfumes no estoque!'}</div>`;
+    return;
+  }
+
+  const splitMode = STATE.period.includes('dia') && STATE.period.includes('noite') && pr.length > 2;
+  let html = '', i = 0;
+
+  if (splitMode) {
+    const grupos = [
+      ['dia', 'Para o seu dia'],
+      ['noite', 'Para a sua noite'],
+      ['versatil', 'Versáteis · dia e noite']
+    ];
+    let primeiro = true;
+    grupos.forEach(([g, titulo]) => {
+      const itens = pr.filter(p => grupoDe(p) === g);
+      if (!itens.length) return;
+      html += `<div class="res-group${primeiro ? ' first' : ''}">${titulo}</div>`;
+      primeiro = false;
+      itens.forEach(p => { i++; html += cardHtml(p, i, aiData, i === 1); });
+    });
+  } else {
+    pr.forEach(p => { i++; html += cardHtml(p, i, aiData, i === 1); });
+  }
+
+  if (ex.length) {
+    html += `<div class="res-group">Você também pode gostar</div>`;
+    ex.forEach(p => { i++; html += cardHtml(p, i, aiData, false); });
+  }
+
+  list.innerHTML = html;
+}
+
 function restart() {
-  Object.assign(STATE, { gender:null, period:[], occasion:[], clima:null, notes:[], avoid:[], impression:null, loves:'', hates:'' });
+  Object.assign(STATE, { gender:null, period:[], occasion:[], clima:null, notes:[], avoid:[], impression:null, intensity:null, sweet:null, loves:'', hates:'' });
+  RESULT_FILTER = null;
   const shR = document.getElementById('sweet-hint'); if (shR) shR.style.display = 'none';
   document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
   document.querySelectorAll('[id^="n"]').forEach(b => b.disabled = true);
@@ -1134,7 +1328,7 @@ function restart() {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('s0').classList.add('active');
   document.getElementById('progress').style.width = '0%';
-  document.getElementById('step-label').textContent = 'Passo 1 de 8';
+  document.getElementById('step-label').textContent = 'Passo 1 de 9';
   document.getElementById('step-pct').textContent = '0%';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
