@@ -397,6 +397,13 @@
   .perfume-link:hover .perfume-card { border-color: var(--gold); background: #FBF6E9; }
   .p-cta { margin-top: 12px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
 </style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FY54SZ8QVM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FY54SZ8QVM');
+</script>
 </head>
 <body>
 <div class="page">
@@ -894,6 +901,21 @@ function pickPref(btn, key) {
   STATE[key] = btn.dataset.val;
 }
 
+// Quanto do perfume e feito das familias escolhidas (0 a 1): desempate por foco
+function especificidade(p) {
+  if (!STATE.notes.length || !p.nt.length) return 0;
+  return p.nt.filter(n => STATE.notes.includes(n)).length / p.nt.length;
+}
+
+// Ordena por score; no empate vence o perfume mais focado nas familias escolhidas
+function compararMatch(a, b) {
+  if (b.score !== a.score) return b.score - a.score;
+  const ea = especificidade(a), eb = especificidade(b);
+  if (eb !== ea) return eb - ea;
+  if (a.nt.length !== b.nt.length) return a.nt.length - b.nt.length;
+  return a.n.localeCompare(b.n);
+}
+
 // Nível de doçura do perfume: 2 = gourmand, 1 = levemente adocicado, 0 = seco
 function sweetLevel(p) {
   if (p.nt.includes('gourmand')) return 2;
@@ -1167,7 +1189,7 @@ function showResults(aiData) {
   function rank(limit) {
     return CAT.map(p => ({ ...p, score: scoreP(p, aiData) }))
       .filter(p => p.score > 2)
-      .sort((a, b) => b.score - a.score)
+      .sort(compararMatch)
       .slice(0, limit);
   }
   NOTE_MODE = 'all';
@@ -1178,7 +1200,7 @@ function showResults(aiData) {
   const cumpreRegra = p => STATE.notes.length === 0 || STATE.notes.every(n => p.nt.includes(n));
   const extras = CAT.map(p => ({ ...p, score: scoreP(p, aiData) }))
     .filter(p => p.score > 2 && !usados.has(p.n) && (STATE.notes.length === 0 || !cumpreRegra(p)))
-    .sort((a, b) => b.score - a.score)
+    .sort(compararMatch)
     .slice(0, 4);
 
   window.__RES = { principais, extras, aiData };
@@ -1190,6 +1212,20 @@ function showResults(aiData) {
     : `Perfumes ${STATE.impression ? STATE.impression + 's' : gLabel} que combinam com seu perfil.`;
 
   renderResults();
+  trackEvent('quiz_concluido', {
+    genero: STATE.gender || '',
+    periodo: STATE.period.join('|'),
+    ocasiao: STATE.occasion.join('|'),
+    clima: STATE.clima || '',
+    familias: STATE.notes.join('|'),
+    vetadas: (STATE.avoid || []).join('|'),
+    impressao: STATE.impression || '',
+    presenca: STATE.intensity || '',
+    docura: STATE.sweet || '',
+    tem_perfume_amado: STATE.loves ? 'sim' : 'nao',
+    qtd_sugestoes: principais.length + extras.length,
+    top1: principais[0] ? principais[0].n : ''
+  });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1265,6 +1301,25 @@ function cardHtml(p, idx, aiData, isTop) {
   </div>`;
   return link ? `<a class="perfume-link" href="${link}" target="_blank" rel="noopener">${card}</a>` : card;
 }
+
+function trackEvent(nome, params) {
+  try { if (typeof gtag === 'function') gtag('event', nome, params || {}); } catch (e) {}
+}
+
+document.addEventListener('click', function (ev) {
+  const a = ev.target.closest && ev.target.closest('.perfume-link');
+  if (!a) return;
+  const card = a.querySelector('.perfume-card');
+  const nome = card ? (card.querySelector('.p-name') || {}).textContent : '';
+  const pos = card ? (card.querySelector('.rank') || {}).textContent : '';
+  trackEvent('clique_sugestao', {
+    perfume: (nome || '').trim(),
+    posicao: (pos || '').trim(),
+    familias_escolhidas: STATE.notes.join('|'),
+    presenca: STATE.intensity || '',
+    docura: STATE.sweet || ''
+  });
+});
 
 function renderResults() {
   const { principais, extras, aiData } = window.__RES || { principais: [], extras: [], aiData: null };
